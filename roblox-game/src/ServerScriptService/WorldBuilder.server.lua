@@ -200,7 +200,9 @@ welcomeSign.CFrame = CFrame.new(LOBBY_CENTER + Vector3.new(0, GROUND_Y + 4, -20)
 welcomeSign.Parent = decorationsFolder
 
 local welcomeGui = Instance.new("SurfaceGui")
-welcomeGui.Face = Enum.NormalId.Front
+-- The sign sits at -Z from spawn and default characters face -Z, so players
+-- approach it from the +Z side: that's the Back face, not Front.
+welcomeGui.Face = Enum.NormalId.Back
 welcomeGui.Parent = welcomeSign
 
 local welcomeLabel = Instance.new("TextLabel")

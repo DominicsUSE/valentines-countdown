@@ -42,16 +42,29 @@ local function broadcastState(text)
 	gameStateRemote:FireAllClients(text)
 end
 
+local function awardEscape(player)
+	local leaderstats = player:FindFirstChild("leaderstats")
+	local escapes = leaderstats and leaderstats:FindFirstChild("Escapes")
+	if escapes then
+		escapes.Value += 1
+	end
+end
+
 local exitGate = getExitGate()
 local exitPrompt = exitGate and exitGate:FindFirstChildOfClass("ProximityPrompt")
 
 if exitPrompt then
 	exitPrompt.Enabled = false
 	exitPrompt.Triggered:Connect(function(player)
-		if not exitPrompt.Enabled then
+		if not exitPrompt.Enabled or player:GetAttribute("Jailed") or player:GetAttribute("Escaped") then
 			return
 		end
+
 		player:SetAttribute("Escaped", true)
+		-- Award immediately (not at round end) so a player who escapes and
+		-- then disconnects still keeps the credit for it.
+		awardEscape(player)
+
 		local lobbySpawn = getLobbySpawn()
 		if lobbySpawn then
 			teleportPlayer(player, lobbySpawn.CFrame)
@@ -59,30 +72,33 @@ if exitPrompt then
 	end)
 end
 
-local function allEscaped()
-	local sawPlayer = false
-	for _, player in ipairs(Players:GetPlayers()) do
-		if player.Character then
-			sawPlayer = true
-			if not player:GetAttribute("Escaped") then
-				return false
-			end
+-- Win/lose checks only ever look at the players who were actually
+-- teleported into this specific round (`participants`), not everyone
+-- connected to the server. Otherwise a player who joins mid-round and is
+-- waiting in the lobby for the next round would never have Escaped = true,
+-- permanently blocking the round from ever resolving as a win.
+local function allEscaped(participants)
+	if #participants == 0 then
+		return false
+	end
+	for _, player in ipairs(participants) do
+		if player.Parent and not player:GetAttribute("Escaped") then
+			return false
 		end
 	end
-	return sawPlayer
+	return true
 end
 
-local function allJailedOrEscaped()
-	local sawPlayer = false
-	for _, player in ipairs(Players:GetPlayers()) do
-		if player.Character then
-			sawPlayer = true
-			if not player:GetAttribute("Escaped") and not player:GetAttribute("Jailed") then
-				return false
-			end
+local function allJailedOrEscaped(participants)
+	if #participants == 0 then
+		return false
+	end
+	for _, player in ipairs(participants) do
+		if player.Parent and not player:GetAttribute("Escaped") and not player:GetAttribute("Jailed") then
+			return false
 		end
 	end
-	return sawPlayer
+	return true
 end
 
 local function resetPlayerForRound(player)
@@ -108,6 +124,7 @@ local function startRound()
 	LanternManager.ResetAll()
 	JailManager.ClearForNewRound()
 
+	local roundParticipants = {}
 	local mapSpawns = getMapSpawns()
 	local spawnIndex = 0
 	for _, player in ipairs(Players:GetPlayers()) do
@@ -116,6 +133,7 @@ local function startRound()
 			spawnIndex += 1
 			local spawnPoint = mapSpawns[((spawnIndex - 1) % #mapSpawns) + 1]
 			teleportPlayer(player, spawnPoint.CFrame)
+			table.insert(roundParticipants, player)
 		end
 	end
 
@@ -140,12 +158,12 @@ local function startRound()
 			broadcastState("The gate is open! Get out!")
 		end
 
-		if allEscaped() then
+		if allEscaped(roundParticipants) then
 			result = "Win"
 			break
 		end
 
-		if allJailedOrEscaped() then
+		if allJailedOrEscaped(roundParticipants) then
 			result = "Lose"
 			break
 		end
@@ -156,18 +174,6 @@ local function startRound()
 	MonsterAI.Stop()
 	if exitPrompt then
 		exitPrompt.Enabled = false
-	end
-
-	-- Award Escapes to anyone who made it out, regardless of how the round
-	-- ended overall (players can escape before the rest get jailed).
-	for _, player in ipairs(Players:GetPlayers()) do
-		if player:GetAttribute("Escaped") then
-			local leaderstats = player:FindFirstChild("leaderstats")
-			local escapes = leaderstats and leaderstats:FindFirstChild("Escapes")
-			if escapes then
-				escapes.Value += 1
-			end
-		end
 	end
 
 	if result == "Win" then

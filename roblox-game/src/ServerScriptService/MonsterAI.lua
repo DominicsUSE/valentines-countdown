@@ -11,6 +11,7 @@ local MonsterAI = {}
 local monsterModel, humanoid, rootPart
 local running = false
 local currentChaseTarget
+local currentPatrolPoint
 
 local function buildMonster()
 	local model = Instance.new("Model")
@@ -80,7 +81,7 @@ local function buildMonster()
 	local hum = Instance.new("Humanoid")
 	hum.WalkSpeed = GameConfig.MonsterPatrolSpeed
 	hum.JumpPower = 0
-	hum.HipHeight = 0
+	hum.HipHeight = torso.Size.Y / 2
 	hum.MaxHealth = 1000000
 	hum.Health = 1000000
 	hum.Parent = model
@@ -116,11 +117,18 @@ local function findNearestFreePlayer()
 	return bestPlayer, bestDist
 end
 
+local function pickNewPatrolPoint()
+	local patrolPoints = getPatrolPoints()
+	if #patrolPoints > 0 then
+		currentPatrolPoint = patrolPoints[math.random(1, #patrolPoints)]
+	end
+end
+
 local function aiLoop()
 	local nextRepathTime = 0
 
 	while running do
-		task.wait(0.2)
+		task.wait(GameConfig.MonsterTickSeconds)
 
 		if not rootPart or not rootPart.Parent then
 			break
@@ -152,10 +160,16 @@ local function aiLoop()
 			end
 		else
 			humanoid.WalkSpeed = GameConfig.MonsterPatrolSpeed
-			local patrolPoints = getPatrolPoints()
-			if #patrolPoints > 0 then
-				local point = patrolPoints[math.random(1, #patrolPoints)]
-				humanoid:MoveTo(point.Position)
+
+			if not currentPatrolPoint or not currentPatrolPoint.Parent then
+				pickNewPatrolPoint()
+			end
+
+			if currentPatrolPoint then
+				humanoid:MoveTo(currentPatrolPoint.Position)
+				if (currentPatrolPoint.Position - rootPart.Position).Magnitude <= GameConfig.MonsterPatrolArriveRadius then
+					pickNewPatrolPoint()
+				end
 			end
 		end
 	end
@@ -177,6 +191,7 @@ function MonsterAI.Start()
 	end
 
 	currentChaseTarget = nil
+	currentPatrolPoint = nil
 	monsterModel.Parent = workspace
 
 	task.spawn(aiLoop)
@@ -185,6 +200,7 @@ end
 function MonsterAI.Stop()
 	running = false
 	currentChaseTarget = nil
+	currentPatrolPoint = nil
 	if monsterModel then
 		monsterModel.Parent = nil
 	end
