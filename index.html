@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BookedAI — AI-Powered B2B Appointment Setting</title>
 <meta name="description" content="BookedAI books qualified sales meetings for B2B companies using AI-personalized outreach at scale. Low-risk pricing: modest base fee plus per-meeting bonus.">
+<meta property="og:title" content="BookedAI — AI-Powered B2B Appointment Setting">
+<meta property="og:description" content="We find your prospects, write them a personal message with AI, and hand you a booked sales call.">
+<meta property="og:type" content="website">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2'%3E%3Crect width='24' height='24' rx='6' fill='%230369A1'/%3E%3Cpath d='M8 3v3M16 3v3M4 9h16' stroke-linecap='round'/%3E%3Cpath d='m8.5 15 2 2 4.5-4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -211,9 +214,10 @@
     padding: 28px;
     box-shadow: 0 30px 60px -30px rgba(15, 23, 42, 0.25);
   }
+  .hero-card-tag { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted-fg); margin-bottom: 6px; }
   .hero-card .row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--color-border); }
   .hero-card .row:last-child { border-bottom: none; }
-  .hero-card .row-label { font-size: 14px; color: var(--color-muted-fg); }
+  .hero-card .row-label { font-size: 15px; font-weight: 600; color: var(--color-primary); }
   .hero-card .row-value { font-weight: 700; color: var(--color-primary); }
   .hero-card .badge {
     display: inline-flex; align-items: center; gap: 6px;
@@ -375,6 +379,7 @@
   .field { margin-bottom: 18px; }
   .field label { display: block; font-size: 14px; font-weight: 600; color: var(--color-primary); margin-bottom: 6px; }
   .field .req { color: var(--color-accent); }
+  .field .opt { color: var(--color-muted-fg); font-weight: 400; }
   .field input,
   .field select,
   .field textarea {
@@ -474,7 +479,6 @@
     }
     #primary-menu[data-open="true"] a:not(.mobile-cta) { padding: 12px 0; border-bottom: 1px solid var(--color-border); }
     #primary-menu[data-open="true"] .mobile-cta { display: inline-flex; margin-top: 16px; }
-    .nav-actions .btn-ghost,
     .nav-actions .btn-primary { display: none; }
   }
 
@@ -514,7 +518,6 @@
     </nav>
 
     <div class="nav-actions">
-      <a class="btn btn-ghost" href="#contact">Log in</a>
       <a class="btn btn-primary" href="#contact">Book a Strategy Call</a>
       <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="primary-menu" aria-label="Toggle menu">
         <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
@@ -533,9 +536,8 @@
         <p class="eyebrow"><span class="dot"></span>AI-Powered B2B Appointment Setting</p>
         <h1>Sales meetings, <span class="accent">delivered</span> — not chased.</h1>
         <p class="lede">
-          We find your ideal prospects, research and personalize outreach with AI,
-          and hand you booked calls with decision-makers. Built for teams selling
-          $5,000+ deals who'd rather close than prospect.
+          We find the right people, write them a personal message using AI,
+          and hand you a booked call. You just show up and close.
         </p>
         <div class="hero-ctas">
           <a class="btn btn-primary" href="#contact">
@@ -548,20 +550,18 @@
       </div>
 
       <div class="hero-card" aria-hidden="true">
+        <p class="hero-card-tag">How a meeting gets booked</p>
         <div class="row">
-          <span class="row-label">Prospects researched this week</span>
-          <span class="row-value">312</span>
+          <span class="row-label">1. You tell us who you want to sell to</span>
         </div>
         <div class="row">
-          <span class="row-label">Personalized messages sent</span>
-          <span class="row-value">288</span>
+          <span class="row-label">2. AI writes them a personal message</span>
         </div>
         <div class="row">
-          <span class="row-label">Reply rate</span>
-          <span class="row-value">14%</span>
+          <span class="row-label">3. They say yes to a call</span>
         </div>
         <div class="row">
-          <span class="row-label">Meeting: Thu 2:00 PM</span>
+          <span class="row-label">4. It's on your calendar</span>
           <span class="badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Confirmed
@@ -576,30 +576,30 @@
     <div class="container">
       <div class="section-head">
         <p class="eyebrow"><span class="dot"></span>How It Works</p>
-        <h2>From ideal customer profile to booked call</h2>
-        <p class="lede">Four steps, running continuously in the background — no manual prospecting hours.</p>
+        <h2>Four simple steps</h2>
+        <p class="lede">No manual prospecting. It just runs.</p>
       </div>
 
       <div class="steps">
         <div class="step">
           <div class="step-num">1</div>
           <h3>Find</h3>
-          <p>We identify prospects matching your ideal customer profile using verified B2B data sources.</p>
+          <p>We find people who match who you want to sell to.</p>
         </div>
         <div class="step">
           <div class="step-num">2</div>
-          <h3>Research &amp; personalize</h3>
-          <p>AI reads each prospect's public info and drafts a message that reads as genuinely hand-written — in seconds, not hours.</p>
+          <h3>Personalize</h3>
+          <p>AI reads about each person and writes them a message that sounds hand-written, not copy-pasted.</p>
         </div>
         <div class="step">
           <div class="step-num">3</div>
           <h3>Reach out</h3>
-          <p>Outreach runs through deliverability-optimized infrastructure — inbox warm-up and rotation — so it lands in the inbox.</p>
+          <p>We send it in a way built to land in the inbox, not the spam folder.</p>
         </div>
         <div class="step">
           <div class="step-num">4</div>
           <h3>Book</h3>
-          <p>When a prospect says yes, we schedule the call straight onto your calendar. You show up and close.</p>
+          <p>When they say yes, the meeting goes straight on your calendar.</p>
         </div>
       </div>
     </div>
@@ -610,8 +610,8 @@
     <div class="container">
       <div class="section-head">
         <p class="eyebrow"><span class="dot"></span>Why It Works</p>
-        <h2>A proven market, delivered cheaper and faster</h2>
-        <p class="lede">Businesses already pay for this. AI just removes the tedious, expensive part.</p>
+        <h2>A proven market, cheaper and faster</h2>
+        <p class="lede">Businesses already pay for this every month. AI just removes the slow, expensive part.</p>
       </div>
 
       <div class="stats">
@@ -625,7 +625,7 @@
         </div>
         <div class="stat">
           <p class="value">Seconds</p>
-          <p class="label">AI research + drafting per prospect</p>
+          <p class="label">Time to research and write each message</p>
         </div>
         <div class="stat">
           <p class="value">$5K+</p>
@@ -634,8 +634,8 @@
       </div>
 
       <div class="proof-quote">
-        <p class="quote">"We run this exact process on ourselves first. Every client result comes from outreach we've already proven on our own pipeline."</p>
-        <p class="attribution">— How we validate every campaign before it reaches your prospects</p>
+        <p class="quote">"We test every campaign on ourselves first, before it ever reaches your prospects."</p>
+        <p class="attribution">— Why we trust our own process</p>
       </div>
     </div>
   </section>
@@ -646,7 +646,7 @@
       <div class="section-head">
         <p class="eyebrow"><span class="dot"></span>The Stack</p>
         <h2>Proven tools, not a black box</h2>
-        <p class="lede">We plug together best-in-class infrastructure — nothing experimental with your outreach.</p>
+        <p class="lede">We use trusted, existing tools — nothing experimental with your outreach.</p>
       </div>
 
       <div class="tools-grid">
@@ -654,29 +654,29 @@
           <span class="icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/></svg>
           </span>
-          <h3>Prospect Data</h3>
-          <p>Finds contacts matching your target customer profile.</p>
+          <h3>Finding people</h3>
+          <p>A data tool finds contacts who match who you want to reach.</p>
         </div>
         <div class="tool">
           <span class="icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 0-5 5v3a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5Z"/><path d="M19 11v1a7 7 0 0 1-14 0v-1M12 19v3" stroke-linecap="round"/></svg>
           </span>
-          <h3>AI Research &amp; Writing</h3>
-          <p>An LLM researches each prospect and drafts personalized outreach.</p>
+          <h3>Writing the message</h3>
+          <p>AI researches each person and writes them a personal note.</p>
         </div>
         <div class="tool">
           <span class="icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
-          <h3>Deliverability Platform</h3>
-          <p>Inbox warm-up and rotation built for sustained sending.</p>
+          <h3>Sending it well</h3>
+          <p>Built for inboxes, not spam folders.</p>
         </div>
         <div class="tool">
           <span class="icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v3M16 3v3" stroke-linecap="round"/></svg>
           </span>
-          <h3>Scheduling &amp; CRM</h3>
-          <p>Books and tracks every meeting so nothing falls through.</p>
+          <h3>Booking the call</h3>
+          <p>Every meeting is scheduled and tracked, so nothing gets lost.</p>
         </div>
       </div>
     </div>
@@ -705,19 +705,19 @@
         <ul class="pricing-list">
           <li>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Pricing scoped to your average deal size and target volume
+            Priced around your deal size and how many meetings you want
           </li>
           <li>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            The bonus is only paid when a qualified meeting lands on your calendar
+            We only get the bonus once a real meeting is on your calendar
           </li>
           <li>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            No long lock-in — built for a low-friction first month
+            No long contract — easy to try for a first month
           </li>
           <li>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Best fit for deal sizes of $5,000 or more
+            Best fit if what you sell is $5,000 or more
           </li>
         </ul>
         <a class="btn btn-primary btn-block" href="#contact">Get Your Custom Quote</a>
@@ -734,35 +734,29 @@
       </div>
 
       <div class="faq-list">
-        <details class="faq-item">
-          <summary>What counts as a "qualified" meeting?
+        <details class="faq-item" open>
+          <summary>What counts as a "meeting"?
             <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </summary>
-          <p class="faq-answer">A decision-maker at a company matching your ideal customer profile, who has agreed to a scheduled call on your calendar — not just a reply.</p>
+          <p class="faq-answer">A real decision-maker at the right kind of company agrees to a call, and it's on your calendar. Not just someone who replied.</p>
         </details>
         <details class="faq-item">
-          <summary>What if you don't book any meetings?
+          <summary>How is this different from other agencies?
             <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </summary>
-          <p class="faq-answer">The base fee stays modest specifically so this is low-risk — the majority of the upside is tied to the per-meeting bonus, which we only earn when we deliver.</p>
+          <p class="faq-answer">AI does the research and writing that used to take a person hours per message. That means we can reach more people, for less, without it feeling like a generic template.</p>
         </details>
         <details class="faq-item">
-          <summary>How is this different from a normal SDR agency?
+          <summary>Who is this for?
             <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </summary>
-          <p class="faq-answer">AI handles the research and first-draft personalization that used to take a human SDR hours per prospect, so we can reach more of the right people for less — without switching to generic mail-merge templates.</p>
-        </details>
-        <details class="faq-item">
-          <summary>What industries and deal sizes do you work with?
-            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </summary>
-          <p class="faq-answer">We work best with B2B companies selling products or services with deal sizes of roughly $5,000 or more, where a single booked meeting is worth pursuing seriously.</p>
+          <p class="faq-answer">Businesses that sell something worth $5,000 or more, where landing one good meeting is worth chasing.</p>
         </details>
         <details class="faq-item">
           <summary>How fast can we start?
             <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </summary>
-          <p class="faq-answer">Book a strategy call below — once we've scoped your ideal customer profile and pricing, most campaigns can go live within days.</p>
+          <p class="faq-answer">Book a strategy call below. Once we know who you sell to and agree on pricing, most campaigns go live within days.</p>
         </details>
       </div>
     </div>
@@ -774,7 +768,7 @@
       <div class="contact-info">
         <p class="eyebrow"><span class="dot"></span>Get Started</p>
         <h2>Let's fill your calendar with sales calls</h2>
-        <p class="lede">Tell us about your business and ideal customer. We'll follow up to scope pricing and get your first campaign live.</p>
+        <p class="lede">Tell us a bit about your business. We'll follow up to get your first campaign going.</p>
 
         <div class="contact-points">
           <div class="contact-point">
@@ -783,7 +777,7 @@
             </span>
             <div>
               <p class="text-title">Free strategy call</p>
-              <p class="text-desc">We'll map your ideal customer profile and outreach plan together.</p>
+              <p class="text-desc">We'll figure out who to target and how, together.</p>
             </div>
           </div>
           <div class="contact-point">
@@ -791,8 +785,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
             <div>
-              <p class="text-title">No long lock-in</p>
-              <p class="text-desc">Low-risk pricing built for a first campaign, not a year-long contract.</p>
+              <p class="text-title">No long contract</p>
+              <p class="text-desc">Low-risk pricing made for trying us out first.</p>
             </div>
           </div>
           <div class="contact-point">
@@ -801,7 +795,7 @@
             </span>
             <div>
               <p class="text-title">You just show up</p>
-              <p class="text-desc">We hand off booked meetings — your team runs the call and closes.</p>
+              <p class="text-desc">We hand you the booked meeting. You run the call and close.</p>
             </div>
           </div>
         </div>
@@ -828,19 +822,18 @@
         </div>
 
         <div class="field">
-          <label for="deal-size">Average deal size <span class="req">*</span></label>
-          <select id="deal-size" name="deal-size" required>
+          <label for="deal-size">Average deal size <span class="opt">(optional)</span></label>
+          <select id="deal-size" name="deal-size">
             <option value="">Select a range&hellip;</option>
             <option value="Under $5,000">Under $5,000</option>
             <option value="$5,000–$15,000">$5,000&ndash;$15,000</option>
             <option value="$15,000–$50,000">$15,000&ndash;$50,000</option>
             <option value="$50,000+">$50,000+</option>
           </select>
-          <p class="field-error">Please select your average deal size.</p>
         </div>
 
         <div class="field">
-          <label for="message">What are you selling? (optional)</label>
+          <label for="message">What are you selling? <span class="opt">(optional)</span></label>
           <textarea id="message" name="message" placeholder="A quick line on your product or service and who you sell to."></textarea>
         </div>
 
@@ -849,7 +842,7 @@
         </button>
 
         <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
-        <p class="form-fallback">Prefer email? Write to <a href="mailto:hello@bookedai.example">hello@bookedai.example</a> directly.</p>
+        <p class="form-fallback">Prefer email? Write to <a href="mailto:dominic.rimsa@gmail.com">dominic.rimsa@gmail.com</a> directly.</p>
       </form>
     </div>
   </section>
@@ -859,7 +852,7 @@
 <footer class="site">
   <div class="container footer-row">
     <span>&copy; <span id="year"></span> BookedAI. All rights reserved.</span>
-    <a href="mailto:hello@bookedai.example">hello@bookedai.example</a>
+    <a href="mailto:dominic.rimsa@gmail.com">dominic.rimsa@gmail.com</a>
   </div>
 </footer>
 
@@ -897,7 +890,7 @@
     const status = document.getElementById('form-status');
     const submitBtn = document.getElementById('submit-btn');
     const submitLabel = document.getElementById('submit-label');
-    const DEST_EMAIL = 'hello@bookedai.example';
+    const DEST_EMAIL = 'dominic.rimsa@gmail.com';
 
     function fieldWrap(input) { return input.closest('.field'); }
 
