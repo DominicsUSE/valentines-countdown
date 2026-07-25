@@ -8,6 +8,7 @@
 <meta property="og:title" content="BookedAI — AI-Powered B2B Appointment Setting">
 <meta property="og:description" content="We find your prospects, write them a personal message with AI, and hand you a booked sales call.">
 <meta property="og:type" content="website">
+<meta name="theme-color" content="#0369A1">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2'%3E%3Crect width='24' height='24' rx='6' fill='%230369A1'/%3E%3Cpath d='M8 3v3M16 3v3M4 9h16' stroke-linecap='round'/%3E%3Cpath d='m8.5 15 2 2 4.5-4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,17 +19,19 @@
     --color-on-primary: #FFFFFF;
     --color-secondary: #334155;
     --color-accent: #0369A1;
+    --color-accent-2: #0D9488;
     --color-on-accent: #FFFFFF;
     --color-background: #F8FAFC;
     --color-foreground: #020617;
     --color-card: #FFFFFF;
-    --color-muted-fg: #64748B;
+    --color-muted-fg: #475569;
     --color-muted-bg: #EEF2F7;
     --color-border: #E2E8F0;
     --radius-lg: 20px;
     --radius-md: 12px;
     --container: 1120px;
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --reveal-duration: 500ms;
   }
 
   *, *::before, *::after { box-sizing: border-box; }
@@ -113,6 +116,8 @@
     transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out), background-color 180ms var(--ease-out);
   }
   .btn svg { width: 18px; height: 18px; }
+  .btn .arrow { transition: transform 180ms var(--ease-out); }
+  .btn:hover .arrow { transform: translateX(3px); }
   .btn-primary { background: var(--color-accent); color: var(--color-on-accent); box-shadow: 0 8px 20px -8px rgba(3, 105, 161, 0.55); }
   .btn-primary:hover { background: #045a89; transform: translateY(-1px); }
   .btn-primary:active { transform: translateY(0); }
@@ -161,7 +166,8 @@
     font-weight: 600;
     color: var(--color-secondary);
     text-decoration: none;
-    padding: 4px 2px;
+    padding: 10px 4px;
+    transition: color 150ms var(--ease-out);
   }
   nav.primary a:hover { color: var(--color-primary); }
   nav.primary a.mobile-cta,
@@ -182,11 +188,21 @@
   .nav-toggle[aria-expanded="true"] .icon-open { display: none; }
   .nav-toggle[aria-expanded="true"] .icon-close { display: block; }
 
-  #primary-menu { display: flex; }
   .mobile-cta { display: none; }
 
   /* Hero */
-  .hero { padding: 96px 0 80px; }
+  .hero { position: relative; padding: 96px 0 96px; overflow: hidden; }
+  .hero .container { position: relative; z-index: 1; }
+
+  .aurora { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .aurora span { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.28; }
+  .aurora .a1 { width: 420px; height: 420px; background: var(--color-accent); top: -120px; left: -80px; }
+  .aurora .a2 { width: 380px; height: 380px; background: var(--color-accent-2); top: -40px; right: -120px; opacity: 0.22; }
+  .aurora .a3 { width: 300px; height: 300px; background: var(--color-accent); bottom: -160px; left: 30%; opacity: 0.12; }
+
+  .wave-divider { position: absolute; left: 0; right: 0; bottom: -1px; line-height: 0; z-index: 1; }
+  .wave-divider svg { width: 100%; height: 48px; display: block; }
+
   .hero-grid {
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
@@ -197,7 +213,19 @@
     font-size: clamp(36px, 5.4vw, 56px);
     line-height: 1.08;
   }
-  .hero h1 .accent { color: var(--color-accent); }
+  .hero h1 .accent {
+    color: var(--color-accent);
+    background: linear-gradient(120deg, var(--color-accent), var(--color-accent-2));
+    background-clip: border-box;
+  }
+  @supports ((background-clip: text) or (-webkit-background-clip: text)) {
+    .hero h1 .accent {
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+  }
   .hero .lede {
     margin-top: 20px;
     font-size: 18px;
@@ -214,11 +242,21 @@
     padding: 28px;
     box-shadow: 0 30px 60px -30px rgba(15, 23, 42, 0.25);
   }
-  .hero-card-tag { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted-fg); margin-bottom: 6px; }
-  .hero-card .row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--color-border); }
-  .hero-card .row:last-child { border-bottom: none; }
+  .hero-card-tag { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted-fg); margin: 0 0 14px; }
+  .demo-message { font-size: 15.5px; font-weight: 600; color: var(--color-primary); line-height: 1.6; margin: 0; }
+  .demo-caret { display: inline-block; width: 2px; height: 15px; background: var(--color-accent); margin-left: 2px; vertical-align: -2px; animation: caret-blink 900ms steps(1) infinite; }
+  .demo-caret.done { animation: none; opacity: 0; }
+  .demo-caret[hidden] { display: none; }
+  @keyframes caret-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+  .demo-sub { margin: 10px 0 0; font-size: 13px; color: var(--color-muted-fg); }
+
+  .hero-card .row { display: flex; align-items: center; justify-content: space-between; }
   .hero-card .row-label { font-size: 15px; font-weight: 600; color: var(--color-primary); }
-  .hero-card .row-value { font-weight: 700; color: var(--color-primary); }
+  .hero-card .demo-result {
+    border-top: 1px solid var(--color-border);
+    padding-top: 18px;
+    margin-top: 20px;
+  }
   .hero-card .badge {
     display: inline-flex; align-items: center; gap: 6px;
     background: #ECFDF5; color: #047857;
@@ -230,7 +268,7 @@
   /* How it works */
   .steps {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 20px;
   }
   .step {
@@ -256,7 +294,7 @@
   /* Stats */
   .stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
   }
   .stat {
@@ -284,7 +322,7 @@
   /* Tool stack */
   .tools-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
   }
   .tool {
@@ -315,7 +353,7 @@
     padding: 40px;
     box-shadow: 0 30px 60px -30px rgba(15, 23, 42, 0.2);
   }
-  .pricing-model { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; }
+  .pricing-model { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin: 28px 0; }
   .pricing-item {
     background: var(--color-muted-bg);
     border-radius: var(--radius-md);
@@ -356,7 +394,7 @@
   /* Contact */
   .contact-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 48px;
     align-items: start;
   }
@@ -402,7 +440,7 @@
     border-color: var(--color-accent);
     box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.15);
   }
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
   .field-error {
     display: none;
     margin-top: 6px;
@@ -427,6 +465,7 @@
 
   .form-fallback { margin-top: 16px; font-size: 13px; color: var(--color-muted-fg); text-align: center; }
   .form-fallback a { color: var(--color-accent); font-weight: 600; text-decoration: underline; }
+  .copy-btn { margin-top: 12px; font-size: 14px; padding: 12px 20px; min-height: 44px; }
 
   /* Footer */
   footer.site {
@@ -445,17 +484,23 @@
   .footer-row a { text-decoration: none; color: var(--color-muted-fg); }
   .footer-row a:hover { color: var(--color-accent); }
 
+  /* Scroll reveal: JS adds .reveal on load, .revealed once the element enters the viewport */
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity var(--reveal-duration) var(--ease-out), transform var(--reveal-duration) var(--ease-out); }
+  .reveal.revealed { opacity: 1; transform: none; }
+
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    .demo-caret { display: none; }
+    .reveal { opacity: 1 !important; transform: none !important; }
   }
 
   @media (max-width: 980px) {
     .hero-grid { grid-template-columns: 1fr; }
     .hero-card { order: -1; }
-    .steps { grid-template-columns: repeat(2, 1fr); }
-    .stats { grid-template-columns: repeat(2, 1fr); }
-    .tools-grid { grid-template-columns: repeat(2, 1fr); }
+    .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .contact-grid { grid-template-columns: 1fr; }
     .contact-info h2 { text-align: center; }
     .contact-info .lede { margin-left: auto; margin-right: auto; }
@@ -486,7 +531,7 @@
     .section { padding: 64px 0; }
     .hero { padding: 48px 0 56px; }
     .steps { grid-template-columns: 1fr; }
-    .stats { grid-template-columns: 1fr 1fr; }
+    .stats { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .tools-grid { grid-template-columns: 1fr; }
     .pricing-model { grid-template-columns: 1fr; }
     .field-row { grid-template-columns: 1fr; }
@@ -531,6 +576,12 @@
 
   <!-- Hero -->
   <section class="hero" id="top">
+    <div class="aurora" aria-hidden="true">
+      <span class="a1"></span>
+      <span class="a2"></span>
+      <span class="a3"></span>
+    </div>
+
     <div class="container hero-grid">
       <div>
         <p class="eyebrow"><span class="dot"></span>AI-Powered B2B Appointment Setting</p>
@@ -542,32 +593,30 @@
         <div class="hero-ctas">
           <a class="btn btn-primary" href="#contact">
             Book a Strategy Call
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
           <a class="btn btn-ghost" href="#how-it-works">See How It Works</a>
         </div>
         <p class="hero-note">Modest base fee + per-meeting bonus. Low risk to start.</p>
       </div>
 
-      <div class="hero-card" aria-hidden="true">
-        <p class="hero-card-tag">How a meeting gets booked</p>
-        <div class="row">
-          <span class="row-label">1. You tell us who you want to sell to</span>
-        </div>
-        <div class="row">
-          <span class="row-label">2. AI writes them a personal message</span>
-        </div>
-        <div class="row">
-          <span class="row-label">3. They say yes to a call</span>
-        </div>
-        <div class="row">
-          <span class="row-label">4. It's on your calendar</span>
+      <div class="hero-card">
+        <p class="hero-card-tag">Example &mdash; AI-personalized outreach</p>
+        <p class="demo-message"><span id="demo-text">Hi {first name} &mdash; saw {company} is expanding into APAC. Worth a quick call?</span><span class="demo-caret" id="demo-caret" hidden aria-hidden="true"></span></p>
+        <p class="demo-sub">Written by AI in seconds, not hours.</p>
+
+        <div class="row demo-result" id="demo-result">
+          <span class="row-label">Meeting: Thu 2:00 PM</span>
           <span class="badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Confirmed
           </span>
         </div>
       </div>
+    </div>
+
+    <div class="wave-divider" aria-hidden="true">
+      <svg viewBox="0 0 1440 48" preserveAspectRatio="none"><path d="M0,24 C240,48 480,0 720,14 C960,28 1200,44 1440,20 L1440,48 L0,48 Z" fill="#FFFFFF"/></svg>
     </div>
   </section>
 
@@ -842,6 +891,7 @@
         </button>
 
         <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+        <button type="button" class="btn btn-ghost btn-block copy-btn" id="copy-btn" hidden>Nothing opened? Copy your details instead</button>
         <p class="form-fallback">Prefer email? Write to <a href="mailto:dominic.rimsa@gmail.com">dominic.rimsa@gmail.com</a> directly.</p>
       </form>
     </div>
@@ -858,6 +908,71 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Hero demo: types out the example message once, then reveals the booked-meeting row.
+  // The HTML already shows the full message + confirmed row statically, so this only
+  // runs (and only needs to succeed) when motion is allowed — reduced motion / no JS
+  // both fall back to the correct, complete static content with zero extra logic.
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const textEl = document.getElementById('demo-text');
+    const caret = document.getElementById('demo-caret');
+    const resultEl = document.getElementById('demo-result');
+    if (!textEl || !caret || !resultEl) return;
+
+    const fullMessage = textEl.textContent;
+    textEl.textContent = '';
+    caret.hidden = false;
+    resultEl.style.opacity = '0';
+    resultEl.style.transition = 'opacity 400ms cubic-bezier(0.16, 1, 0.3, 1)';
+
+    let i = 0;
+    function type() {
+      if (i <= fullMessage.length) {
+        textEl.textContent = fullMessage.slice(0, i);
+        i++;
+        setTimeout(type, 22);
+      } else {
+        caret.classList.add('done');
+        setTimeout(function () { resultEl.style.opacity = '1'; }, 450);
+      }
+    }
+    setTimeout(type, 450);
+  })();
+
+  // Scroll reveal: only engages with motion allowed; content is fully visible without it.
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!('IntersectionObserver' in window)) return;
+
+    function addReveal(el, delayMs) {
+      if (!el) return;
+      el.classList.add('reveal');
+      if (delayMs) el.style.transitionDelay = delayMs + 'ms';
+    }
+
+    document.querySelectorAll('.section-head, .pricing-card, .faq-list').forEach(function (el) {
+      addReveal(el);
+    });
+
+    ['.steps', '.stats', '.tools-grid'].forEach(function (sel) {
+      const container = document.querySelector(sel);
+      if (!container) return;
+      Array.from(container.children).forEach(function (child, i) { addReveal(child, i * 60); });
+    });
+
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+  })();
 
   // Mobile nav toggle
   (function () {
@@ -890,7 +1005,9 @@
     const status = document.getElementById('form-status');
     const submitBtn = document.getElementById('submit-btn');
     const submitLabel = document.getElementById('submit-label');
+    const copyBtn = document.getElementById('copy-btn');
     const DEST_EMAIL = 'dominic.rimsa@gmail.com';
+    const canCopy = !!(navigator.clipboard && window.isSecureContext);
 
     function fieldWrap(input) { return input.closest('.field'); }
 
@@ -928,14 +1045,14 @@
       }
 
       const data = new FormData(form);
-      const subject = encodeURIComponent('Strategy call request — ' + data.get('company'));
-      const body = encodeURIComponent(
+      const plainBody =
         'Name: ' + data.get('name') + '\n' +
         'Email: ' + data.get('email') + '\n' +
         'Company: ' + data.get('company') + '\n' +
-        'Average deal size: ' + data.get('deal-size') + '\n' +
-        'Message: ' + (data.get('message') || '—')
-      );
+        'Average deal size: ' + (data.get('deal-size') || '—') + '\n' +
+        'Message: ' + (data.get('message') || '—');
+      const subject = encodeURIComponent('Strategy call request — ' + data.get('company'));
+      const body = encodeURIComponent(plainBody);
 
       submitBtn.disabled = true;
       submitLabel.textContent = 'Opening your email client…';
@@ -945,10 +1062,25 @@
 
       window.location.href = 'mailto:' + DEST_EMAIL + '?subject=' + subject + '&body=' + body;
 
+      if (canCopy) {
+        copyBtn.hidden = false;
+        copyBtn.textContent = 'Nothing opened? Copy your details instead';
+      }
+
       setTimeout(function () {
         submitBtn.disabled = false;
         submitLabel.textContent = 'Request a Strategy Call';
       }, 2500);
+
+      copyBtn.onclick = function () {
+        navigator.clipboard.writeText('To: ' + DEST_EMAIL + '\nSubject: Strategy call request — ' + data.get('company') + '\n\n' + plainBody)
+          .then(function () {
+            copyBtn.textContent = 'Copied — paste it into an email to ' + DEST_EMAIL;
+          })
+          .catch(function () {
+            copyBtn.textContent = 'Could not copy — email ' + DEST_EMAIL + ' directly';
+          });
+      };
     });
   })();
 </script>
