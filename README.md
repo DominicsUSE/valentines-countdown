@@ -1,119 +1,69 @@
-# Roblox Performance Optimizer (RPO)
+# Roblox Optimizer
 
-A Windows 10/11 desktop app (.NET 8, WPF) that helps you understand *why*
-Roblox feels laggy and apply safe, transparent, fully-reversible Windows,
-network, and Roblox-adjacent settings changes. It cannot exceed your
-hardware's limits or reduce Internet latency below what your connection and
-physical distance to a server allow, and it says so.
+A tiny, single-window Windows app that makes Roblox run a bit smoother with
+one click. Everything it changes lives in your own Windows user account -
+it never asks for administrator permission, never touches antivirus/
+firewall/Windows Update, and every change has an Undo.
 
-See `docs/ARCHITECTURE.md` for the design/safety model and `docs/SAFETY_MODEL.md`
-for the complete "what this will and will never do" checklist before reading
-any code.
+## What it does
 
-## Directory structure
+- **Dashboard**: shows whether Roblox is running, current CPU and RAM usage,
+  and ping to a public Internet server (a general connection check, not
+  your exact Roblox server ping - it's labeled that way in the app).
+- **Optimize for Roblox** (one button):
+  - Switches Windows to the "High performance" power plan.
+  - Turns off the Xbox Game Bar overlay (Settings > Gaming > Xbox Game Bar -
+    the same switch, just flipped from the app).
+  - If Roblox is open: sets it to use your dedicated graphics card (on
+    laptops/PCs with two GPUs) and slightly raises its process priority
+    (never to Realtime).
+- **Undo Changes** (one button): puts all of the above back exactly how it
+  was.
 
-```
-RobloxPerformanceOptimizer/
-├── RobloxPerformanceOptimizer.sln
-├── Directory.Build.props            # shared MSBuild settings (Nullable, ImplicitUsings, ...)
-├── docs/
-│   ├── ARCHITECTURE.md              # module map, data flow, elevation model
-│   └── SAFETY_MODEL.md              # admin-rights table, reversibility guarantee
-├── src/
-│   ├── RobloxOptimizer.Core/            # models, enums, interfaces - no Windows API calls
-│   ├── RobloxOptimizer.Monitoring/       # CPU/RAM/GPU/disk, temperature, throttle, FPS tracing
-│   ├── RobloxOptimizer.Network/          # ping/jitter/packet loss, Wi-Fi signal, DNS flush
-│   ├── RobloxOptimizer.RobloxIntegration/# RobloxPlayerBeta.exe detection, guidance profiles
-│   ├── RobloxOptimizer.Optimization/     # reversible actions + recommendation engine
-│   ├── RobloxOptimizer.Backup/           # JSON settings backup, System Restore point
-│   ├── RobloxOptimizer.Logging/          # local audit log
-│   └── RobloxOptimizer.App/              # WPF UI (composition root)
-│       ├── app.manifest                 # requestedExecutionLevel="asInvoker"
-│       ├── App.xaml(.cs)                # DI wiring + elevated-helper dispatch
-│       ├── Elevation/                   # briefly-elevated helper process pattern
-│       ├── ViewModels/, Views/, Converters/, Themes/, Helpers/
-└── tests/
-    └── RobloxOptimizer.Tests/            # xUnit tests for pure logic
-```
+All of this is stored under `HKEY_CURRENT_USER`, so none of it requires an
+admin prompt. If you close the app (or it crashes) while changes are still
+applied, it also keeps a small backup file at
+`%LOCALAPPDATA%\RobloxOptimizer\backup.txt` so the next time you open it,
+Undo still works.
 
-Every project belongs under `src/<ProjectName>/`, matching its assembly
-name; there is one `.csproj` per folder. `RobloxOptimizer.App` is the only
-project that references all the others (composition root) - see the
-dependency diagram in `docs/ARCHITECTURE.md`.
+## What it will never do
+
+- Ask for administrator rights.
+- Touch antivirus software, the Windows Firewall, or Windows Update.
+- Modify Roblox's own files, settings, or FastFlags, or read its memory.
+- Promise a specific FPS number or "zero ping" - performance still depends
+  on your hardware, your internet connection, and the specific Roblox
+  experience/server you're in.
 
 ## Requirements
 
-- Windows 10 (1809+) or Windows 11.
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (Windows Desktop workload included).
-- Visual Studio 2022 17.8+ (optional, for the IDE experience) or just the `dotnet` CLI.
+- Windows 10 or Windows 11.
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (Windows Desktop workload).
 
 ## Build and run
 
 ```powershell
 git clone <this-repository>
-cd RobloxPerformanceOptimizer
-dotnet restore
-dotnet build -c Release
-dotnet run --project src\RobloxOptimizer.App\RobloxOptimizer.App.csproj -c Release
+cd valentines-countdown
+dotnet run --project src\RobloxOptimizer\RobloxOptimizer.csproj
 ```
 
-To produce a single-folder, self-contained build you can copy to another
-Windows PC without installing the .NET runtime separately:
+Or open `RobloxOptimizer.sln` in Visual Studio 2022 and press F5.
+
+To build a single-file executable you can copy to another PC:
 
 ```powershell
-dotnet publish src\RobloxOptimizer.App\RobloxOptimizer.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
+dotnet publish src\RobloxOptimizer\RobloxOptimizer.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
 ```
 
-The published `RobloxOptimizer.exe` in `publish\` runs standalone. It never
-launches elevated by itself (see `app.manifest`); a UAC prompt only appears
-the moment you use one of the two features that genuinely need it
-(creating a System Restore point, or disabling an all-users startup entry) -
-see `docs/SAFETY_MODEL.md`.
+## How it's built
 
-## Running the tests
+One WPF project (`src/RobloxOptimizer/`), two code files:
 
-```powershell
-dotnet test tests\RobloxOptimizer.Tests\RobloxOptimizer.Tests.csproj
-```
-
-The test project targets `net8.0-windows` and covers the pure logic that
-doesn't require live hardware/registry access: the recommendation engine's
-FPS-vs-network-lag classification and thresholds, the Wi-Fi signal parser
-(against captured sample `netsh` output), the settings-backup round trip,
-and the `Measurement<T>` "never fabricate a value" contract.
-
-## What each stage of this build covers
-
-1. **Architecture and safety model** - `docs/ARCHITECTURE.md`, `docs/SAFETY_MODEL.md`.
-2. **Directory structure** - above, and the `src/`/`tests/` tree itself.
-3. **Performance-monitoring dashboard** - `RobloxOptimizer.Monitoring` (`SystemMonitor`, `TemperatureMonitor`, `FpsMonitor`) surfaced on `Views/DashboardView.xaml`.
-4. **Roblox process detection** - `RobloxOptimizer.RobloxIntegration` (`RobloxDetector`, `RobloxProfileCatalog`).
-5. **Network diagnostics** - `RobloxOptimizer.Network` (`NetworkDiagnostics`, `WifiSignalReader`, `RegionalEndpoints`).
-6. **Safe, reversible optimization actions** - `RobloxOptimizer.Optimization` (`Actions/*`, `RecommendationEngine`, `OptimizationOrchestrator`).
-7. **Backup and restore** - `RobloxOptimizer.Backup` (`BackupService`, `RestorePointService`), `RobloxOptimizer.Logging` (`AuditLogger`).
-8. **Error handling and automated tests** - defensive try/catch throughout every Windows API call (each monitor/diagnostic degrades to "Unavailable" rather than throwing/crashing), plus `tests/RobloxOptimizer.Tests`.
-9. **Build and run instructions** - this section.
-10. **Security/privacy/admin-risk/misleading-claims review** - see "Self-review" below.
-
-## Self-review notes
-
-- **Administrator rights**: requested only via the narrow, whitelisted
-  relaunch in `RobloxOptimizer.App/Elevation`, for exactly the two actions
-  listed in `docs/SAFETY_MODEL.md` (System Restore point, all-users startup
-  entries). The main window and every other feature run as a standard user.
-- **Privacy**: no network calls other than the diagnostic ICMP pings the
-  user explicitly triggers; no credentials, browsing history, or file
-  contents are ever read; nothing is sent off the device. All state lives
-  under `%LOCALAPPDATA%\RobloxOptimizer\`.
-- **No misleading claims**: every dashboard value is either a real
-  measurement or the literal word "Unavailable" with a reason
-  (`Measurement<T>` in `RobloxOptimizer.Core`) - see especially the FPS
-  monitor and regional-ping sections of `docs/ARCHITECTURE.md` for the two
-  places this app is most tempted to guess, and doesn't.
-- **Reversibility**: every `IOptimizationAction` implements capture/apply/undo
-  against the same backup snapshot; the "Optimize for Roblox" bundle is
-  additionally auto-reverted the instant `RobloxDetector` reports Roblox has
-  exited (`OptimizationOrchestrator.OnRobloxExited`).
-- **Roblox rules**: nothing here reads Roblox's memory, edits its files or
-  FastFlags, or automates input into the game - confirmed by grep across
-  `RobloxOptimizer.RobloxIntegration` and `RobloxOptimizer.Optimization`.
+- `MainWindow.xaml` - the whole UI.
+- `MainWindow.xaml.cs` - the whole app: reads CPU/RAM/ping/Roblox status
+  every 2 seconds, and implements Optimize/Undo directly against the
+  Windows registry and `powercfg`, with a small on-disk backup file for
+  crash resilience. No dependency-injection container, no separate
+  projects for each concern - deliberately kept to one file per concern so
+  it's easy to read top to bottom.

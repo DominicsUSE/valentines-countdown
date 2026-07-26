@@ -1,0 +1,45 @@
+<Window x:Class="RobloxOptimizer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Roblox Optimizer" Height="520" Width="420"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize"
+        FontFamily="Segoe UI" FontSize="13">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Roblox Optimizer" FontSize="24" FontWeight="Bold" Margin="0,0,0,4"/>
+        <TextBlock Grid.Row="1" Text="One button to make Roblox run smoother - everything it changes can be undone."
+                   Foreground="#666666" TextWrapping="Wrap" Margin="0,0,0,12"/>
+
+        <Border Grid.Row="2" BorderBrush="#CCCCCC" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,12">
+            <StackPanel>
+                <TextBlock x:Name="RobloxStatusText" Text="Roblox: checking..." Margin="0,0,0,6" FontWeight="SemiBold"/>
+                <TextBlock x:Name="CpuText" Text="CPU: checking..." Margin="0,0,0,4"/>
+                <TextBlock x:Name="RamText" Text="RAM: checking..." Margin="0,0,0,4"/>
+                <TextBlock x:Name="PingText" Text="Ping: checking..."
+                           ToolTip="Latency to a public Internet server - a general connection check, not your exact Roblox server ping."/>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,12">
+            <Button x:Name="OptimizeButton" Content="Optimize for Roblox" Padding="18,12" FontSize="15" FontWeight="Bold"
+                    Click="OptimizeButton_Click" Margin="0,0,8,0" Cursor="Hand"
+                    ToolTip="Switches to a high-performance power plan, turns off the Xbox Game Bar overlay, and (if Roblox is open) sets it to use your dedicated GPU and slightly raises its priority. All of this is undoable and none of it needs administrator permission."/>
+            <Button x:Name="UndoButton" Content="Undo Changes" Padding="18,12" FontSize="15" Cursor="Hand"
+                    Click="UndoButton_Click" IsEnabled="False"
+                    ToolTip="Puts every setting Optimize changed back to what it was before."/>
+        </StackPanel>
+
+        <Border Grid.Row="4" BorderBrush="#CCCCCC" BorderThickness="1" CornerRadius="6" Padding="10">
+            <ScrollViewer x:Name="LogScrollViewer" VerticalScrollBarVisibility="Auto">
+                <TextBlock x:Name="LogText" TextWrapping="Wrap" Text="Ready." Foreground="#444444"/>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>
