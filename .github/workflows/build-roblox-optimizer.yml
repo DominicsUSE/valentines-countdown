@@ -1,0 +1,44 @@
+name: Build Roblox Optimizer (Windows)
+
+# Builds a ready-to-run Windows executable so you don't need the .NET SDK
+# installed locally just to try the app. After a run finishes, open it from
+# the "Actions" tab on GitHub and download the "RobloxOptimizer-win-x64" zip
+# under "Artifacts".
+
+on:
+  push:
+    branches:
+      - claude/roblox-performance-optimizer-lv27xz
+    paths:
+      - "src/RobloxOptimizer/**"
+      - ".github/workflows/build-roblox-optimizer.yml"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Publish a self-contained, single-file executable
+        run: >
+          dotnet publish src/RobloxOptimizer/RobloxOptimizer.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -o publish
+
+      - name: Upload the executable as a build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RobloxOptimizer-win-x64
+          path: publish/RobloxOptimizer.exe
+          if-no-files-found: error

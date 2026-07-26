@@ -35,7 +35,39 @@ Undo still works.
   on your hardware, your internet connection, and the specific Roblox
   experience/server you're in.
 
-## Requirements
+## Accessibility
+
+- Every control has a screen-reader-friendly name and description
+  (`AutomationProperties.Name`/`HelpText`), works with Windows' Narrator/JAWS.
+- Full keyboard support: Tab between controls, **Alt+O** for Optimize,
+  **Alt+U** for Undo, **Enter** anywhere triggers Optimize (the default
+  action), and every button shows a visible focus outline.
+- The activity log is a "live region" (`AutomationProperties.LiveSetting`),
+  so a screen reader announces new status messages (like "Done - click Undo
+  Changes...") as they appear, without you needing to move focus to read them.
+- Text and borders use Windows' own system colors/font size instead of
+  hardcoded values, so the app respects your chosen theme, Windows High
+  Contrast mode, and "Make text bigger" accessibility settings.
+- The window is resizable (not locked to one size) for anyone who needs a
+  larger window or bigger text.
+
+## Get a ready-to-run copy without installing anything
+
+Every push to this branch automatically builds a Windows `.exe` via GitHub
+Actions - no need to install the .NET SDK just to try it:
+
+1. Open this repository on GitHub and click the **Actions** tab.
+2. Open the latest **"Build Roblox Optimizer (Windows)"** run (or click
+   **Run workflow** to start one on demand).
+3. Once it finishes (~1-2 minutes), download the **RobloxOptimizer-win-x64**
+   artifact - it's a zip containing one self-contained `RobloxOptimizer.exe`
+   you can run directly, no install required.
+
+Windows SmartScreen may warn about an unsigned executable from an unknown
+publisher the first time you run it (`More info` > `Run anyway`) - that's
+expected for an app that isn't code-signed yet, not a sign anything is wrong.
+
+## Requirements (only if you want to build it yourself instead)
 
 - Windows 10 or Windows 11.
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (Windows Desktop workload).
