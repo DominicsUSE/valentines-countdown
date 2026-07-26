@@ -242,6 +242,8 @@ public partial class MainWindow : Window
 
     private void MainWindow_Closing(object? sender, CancelEventArgs e)
     {
+        StopVoiceActivity();
+
         // If an Optimize/Undo is already running in the background, don't run a second, concurrent
         // Undo on top of it - the in-flight one will finish (or, worst case, the backup file written
         // by Optimize lets the user click Undo again next time the app is opened).

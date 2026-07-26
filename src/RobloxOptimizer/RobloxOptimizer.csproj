@@ -12,8 +12,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- The only external dependency: Microsoft's own package for reading system CPU usage. -->
+    <!-- Microsoft's own package for reading system CPU usage. -->
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.1" />
+    <!-- NAudio: mic recording/playback for the Voice Effects tab (well-known, MIT-licensed, actively maintained). -->
+    <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
 
 </Project>
