@@ -1,0 +1,23 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+
+## Visual Studio
+.vs/
+*.userprefs
+
+## Rider
+.idea/
+
+## Build output
+publish/
+artifacts/
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Local app data used during manual testing
+*.local.json

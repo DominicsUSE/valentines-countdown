@@ -1,0 +1,72 @@
+<UserControl x:Class="RobloxOptimizer.App.Views.RecommendationsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="4,16,4,4">
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                <Button Style="{StaticResource BigActionButtonStyle}" Content="Apply Recommended Fixes" Command="{Binding ApplyRecommendedFixesCommand}" Margin="0,0,8,0"
+                        ToolTip="Applies every automatable recommendation below that hasn't been applied yet, then re-measures FPS/ping so you can see a before/after comparison."/>
+                <Button Style="{StaticResource DangerButtonStyle}" Content="Undo Changes" Command="{Binding UndoChangesCommand}"
+                        ToolTip="Reverts every setting RPO has changed back to what it was before."/>
+            </StackPanel>
+
+            <Border Style="{StaticResource CardStyle}" Visibility="{Binding FpsBenchmark, Converter={StaticResource NullToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="Before / after" Style="{StaticResource MetricLabelStyle}" FontWeight="SemiBold"/>
+                    <TextBlock Style="{StaticResource SecondaryTextStyle}">
+                        <Run Text="Average FPS:"/>
+                        <Run Text="{Binding FpsBenchmark.Before, Converter={StaticResource MeasurementToStringConverter}, ConverterParameter=' FPS', Mode=OneWay}"/>
+                        <Run Text=" -> "/>
+                        <Run Text="{Binding FpsBenchmark.After, Converter={StaticResource MeasurementToStringConverter}, ConverterParameter=' FPS', Mode=OneWay}"/>
+                        <LineBreak/>
+                        <Run Text="Average ping:"/>
+                        <Run Text="{Binding PingBenchmark.Before, Converter={StaticResource MeasurementToStringConverter}, ConverterParameter=' ms', Mode=OneWay}"/>
+                        <Run Text=" -> "/>
+                        <Run Text="{Binding PingBenchmark.After, Converter={StaticResource MeasurementToStringConverter}, ConverterParameter=' ms', Mode=OneWay}"/>
+                    </TextBlock>
+                    <TextBlock Text="Real, freshly-measured numbers from before and after applying fixes - not an estimate." Style="{StaticResource SecondaryTextStyle}" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <ItemsControl ItemsSource="{Binding Recommendations}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <Grid>
+                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="15"/>
+                                    <TextBlock Text="Admin required" HorizontalAlignment="Right" Style="{StaticResource SecondaryTextStyle}"
+                                               Visibility="{Binding RequiresAdmin, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                </Grid>
+                                <TextBlock Style="{StaticResource SecondaryTextStyle}" Margin="0,6,0,0">
+                                    <Run Text="Detected:" FontWeight="SemiBold"/><Run Text="{Binding DetectedProblem, Mode=OneWay}"/>
+                                </TextBlock>
+                                <TextBlock Style="{StaticResource SecondaryTextStyle}" Margin="0,4,0,0">
+                                    <Run Text="Proposed change:" FontWeight="SemiBold"/><Run Text="{Binding ProposedChange, Mode=OneWay}"/>
+                                </TextBlock>
+                                <TextBlock Style="{StaticResource SecondaryTextStyle}" Margin="0,4,0,0">
+                                    <Run Text="Expected benefit:" FontWeight="SemiBold"/><Run Text="{Binding ExpectedBenefit, Mode=OneWay}"/>
+                                </TextBlock>
+                                <TextBlock Style="{StaticResource SecondaryTextStyle}" Margin="0,4,0,0">
+                                    <Run Text="Possible side effects:" FontWeight="SemiBold"/><Run Text="{Binding PossibleSideEffects, Mode=OneWay}"/>
+                                </TextBlock>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Visibility="{Binding IsAutomatable, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Button Content="Apply" Command="{Binding ApplyCommand}" Margin="0,0,8,0"
+                                            IsEnabled="{Binding IsApplied, Converter={StaticResource InverseBooleanConverter}}"/>
+                                    <Button Content="Undo" Command="{Binding UndoCommand}"
+                                            IsEnabled="{Binding IsApplied}"/>
+                                    <TextBlock Text="{Binding LastResultMessage}" Style="{StaticResource SecondaryTextStyle}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="This is guidance to apply yourself - RPO can't automate this one." Style="{StaticResource SecondaryTextStyle}" Margin="0,10,0,0"
+                                           Visibility="{Binding IsAutomatable, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

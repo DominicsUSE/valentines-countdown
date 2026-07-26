@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>RobloxOptimizer.RobloxIntegration</RootNamespace>
+    <AssemblyName>RobloxOptimizer.RobloxIntegration</AssemblyName>
+    <Description>Detects RobloxPlayerBeta.exe and defines the Maximum FPS / Balanced / Visual Quality guidance profiles. Read-only process inspection only - never touches Roblox's files, FastFlags, or memory.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RobloxOptimizer.Core\RobloxOptimizer.Core.csproj" />
+  </ItemGroup>
+
+</Project>

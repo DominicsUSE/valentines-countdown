@@ -1,0 +1,109 @@
+<UserControl x:Class="RobloxOptimizer.App.Views.OptimizeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="4,16,4,4">
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Text="Profile" Style="{StaticResource MetricLabelStyle}" FontWeight="SemiBold"/>
+
+                    <RadioButton GroupName="Profile" Margin="0,4" Content="Maximum FPS"
+                                 IsChecked="{Binding SelectedProfile, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=MaximumFps}"
+                                 ToolTip="Prioritizes frame rate and responsiveness over visual fidelity. Best when you're seeing low or unstable FPS."/>
+                    <RadioButton GroupName="Profile" Margin="0,4" Content="Balanced"
+                                 IsChecked="{Binding SelectedProfile, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Balanced}"
+                                 ToolTip="A middle ground: cleans up background overlays and idle-priority contention without pushing graphics to the minimum."/>
+                    <RadioButton GroupName="Profile" Margin="0,4" Content="Visual Quality"
+                                 IsChecked="{Binding SelectedProfile, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=VisualQuality}"
+                                 ToolTip="Keeps visuals high. Only applies safe background/overlay cleanup - does not force a particular power plan or priority."/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <Button Style="{StaticResource BigActionButtonStyle}" Content="Optimize for Roblox" Command="{Binding OptimizeForRobloxCommand}" Margin="0,0,8,0"
+                                ToolTip="Applies the selected profile's safe Windows settings (power plan, overlays, GPU preference, process priority). Temporary changes are restored automatically when Roblox closes."/>
+                        <Button Style="{StaticResource DangerButtonStyle}" Content="Undo Changes" Command="{Binding UndoChangesCommand}"
+                                ToolTip="Reverts every setting RPO has changed back to what it was before."/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Text="Backup" Style="{StaticResource MetricLabelStyle}" FontWeight="SemiBold"/>
+                    <TextBlock Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap" Margin="0,0,0,8">
+                        RPO keeps a local settings backup automatically. You can additionally request a Windows System Restore point before making changes -
+                        this requires administrator permission (a UAC prompt) and Windows limits automatic restore points to about one per 24 hours.
+                    </TextBlock>
+                    <Button Content="Create System Restore Point" Command="{Binding CreateRestorePointCommand}" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <Grid>
+                        <TextBlock Text="Startup applications" Style="{StaticResource MetricLabelStyle}" FontWeight="SemiBold"/>
+                        <Button Content="Rescan" HorizontalAlignment="Right" Command="{Binding RefreshStartupAppsCommand}" Padding="10,4"/>
+                    </Grid>
+                    <TextBlock Text="Choose which apps you don't need launching every time you sign in to Windows. Disabling never deletes anything - re-enable any item any time."
+                               Style="{StaticResource SecondaryTextStyle}" Margin="0,0,0,8"/>
+                    <ItemsControl ItemsSource="{Binding StartupApps}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding Name}" ToolTip="{Binding CommandLine}"/>
+                                        <TextBlock Style="{StaticResource SecondaryTextStyle}">
+                                            <Run Text="{Binding Location, Mode=OneWay}"/>
+                                            <Run Text=" - requires admin: "/><Run Text="{Binding RequiresAdmin, Mode=OneWay}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <ToggleButton Grid.Column="1" IsChecked="{Binding IsEnabled, Mode=OneWay}" Command="{Binding ToggleCommand}"
+                                                  Content="{Binding IsEnabled, Converter={StaticResource EnabledLabelConverter}}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <Grid>
+                        <TextBlock Text="Background applications" Style="{StaticResource MetricLabelStyle}" FontWeight="SemiBold"/>
+                        <Button Content="Scan" HorizontalAlignment="Right" Command="{Binding RefreshBackgroundAppsCommand}" Padding="10,4"/>
+                    </Grid>
+                    <TextBlock Style="{StaticResource SecondaryTextStyle}" Margin="0,0,0,8" TextWrapping="Wrap">
+                        Closing an app here is not automatically undone - simply reopen it yourself when you're done playing. Protected system/security
+                        processes are never shown here.
+                    </TextBlock>
+                    <ItemsControl ItemsSource="{Binding BackgroundApps}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding ProcessName}" ToolTip="{Binding WindowTitle}"/>
+                                        <TextBlock Style="{StaticResource SecondaryTextStyle}">
+                                            <Run Text="CPU:"/><Run Text="{Binding CpuDisplay, Mode=OneWay}"/>
+                                            <Run Text=" RAM:"/><Run Text="{Binding MemoryDisplay, Mode=OneWay}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Content="Close" Command="{Binding CloseCommand}"
+                                            IsEnabled="{Binding IsClosed, Converter={StaticResource InverseBooleanConverter}}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

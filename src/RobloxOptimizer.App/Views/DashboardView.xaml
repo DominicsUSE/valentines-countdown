@@ -1,0 +1,131 @@
+<UserControl x:Class="RobloxOptimizer.App.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="4,16,4,4">
+
+            <Button Style="{StaticResource BigActionButtonStyle}" Command="{Binding AnalyzeCommand}"
+                    HorizontalAlignment="Left" Margin="0,0,0,8"
+                    ToolTip="Runs a full check: FPS (if Roblox is running), ping/jitter/packet loss, Wi-Fi signal, CPU/RAM/GPU/disk usage, and background apps. Takes a few seconds.">
+                <Grid>
+                    <TextBlock Text="Analyzing..." Visibility="{Binding IsAnalyzing, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <TextBlock Text="Analyze My PC" Visibility="{Binding IsAnalyzing, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                </Grid>
+            </Button>
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Text="FPS lag vs. network lag" Style="{StaticResource MetricLabelStyle}" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding LagExplanation}"/>
+                </StackPanel>
+            </Border>
+
+            <UniformGrid Columns="3" Rows="2">
+
+                <!-- FPS -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,8,8">
+                    <StackPanel>
+                        <Grid>
+                            <TextBlock Text="FPS" Style="{StaticResource MetricLabelStyle}"
+                                       ToolTip="Frames per second reported by RPO's own frame-rate tracing. Requires running as Administrator - if unavailable, check Roblox's own Shift+F5 Performance Stats instead."/>
+                            <Ellipse Width="10" Height="10" HorizontalAlignment="Right" Fill="{Binding FpsStatus, Converter={StaticResource StatusLevelToBrushConverter}}"/>
+                        </Grid>
+                        <TextBlock Text="{Binding FpsAverageDisplay}" Style="{StaticResource MetricValueStyle}"/>
+                        <TextBlock Style="{StaticResource SecondaryTextStyle}">
+                            <Run Text="Current:"/><Run Text="{Binding FpsCurrentDisplay, Mode=OneWay}"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource SecondaryTextStyle}" Visibility="{Binding IsAdvancedMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Run Text="Min / Max:"/><Run Text="{Binding FpsMinDisplay, Mode=OneWay}"/><Run Text="/"/><Run Text="{Binding FpsMaxDisplay, Mode=OneWay}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Ping -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,8,8">
+                    <StackPanel>
+                        <Grid>
+                            <TextBlock Text="Ping" Style="{StaticResource MetricLabelStyle}"
+                                       ToolTip="Round-trip latency to a well-known Internet endpoint - a proxy for general connection quality, not the exact Roblox game-server ping."/>
+                            <Ellipse Width="10" Height="10" HorizontalAlignment="Right" Fill="{Binding NetworkStatus, Converter={StaticResource StatusLevelToBrushConverter}}"/>
+                        </Grid>
+                        <TextBlock Text="{Binding PingAverageDisplay}" Style="{StaticResource MetricValueStyle}"/>
+                        <TextBlock Style="{StaticResource SecondaryTextStyle}">
+                            <Run Text="Current:"/><Run Text="{Binding PingCurrentDisplay, Mode=OneWay}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Network -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8">
+                    <StackPanel>
+                        <Grid>
+                            <TextBlock Text="Network" Style="{StaticResource MetricLabelStyle}"
+                                       ToolTip="Jitter (ping variability) and packet loss cause rubber-banding and disconnects even when average ping looks fine."/>
+                            <Ellipse Width="10" Height="10" HorizontalAlignment="Right" Fill="{Binding NetworkStatus, Converter={StaticResource StatusLevelToBrushConverter}}"/>
+                        </Grid>
+                        <TextBlock Style="{StaticResource SecondaryTextStyle}">
+                            <Run Text="Jitter:"/><Run Text="{Binding JitterDisplay, Mode=OneWay}"/>
+                            <LineBreak/>
+                            <Run Text="Packet loss:"/><Run Text="{Binding PacketLossDisplay, Mode=OneWay}"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource SecondaryTextStyle}" Visibility="{Binding IsAdvancedMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Run Text="Download:"/><Run Text="{Binding DownloadDisplay, Mode=OneWay}"/>
+                            <LineBreak/>
+                            <Run Text="Upload:"/><Run Text="{Binding UploadDisplay, Mode=OneWay}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- System -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,8,0">
+                    <StackPanel>
+                        <Grid>
+                            <TextBlock Text="System" Style="{StaticResource MetricLabelStyle}"
+                                       ToolTip="CPU, RAM, disk, and GPU usage. High sustained usage can starve Roblox of resources."/>
+                            <Ellipse Width="10" Height="10" HorizontalAlignment="Right" Fill="{Binding SystemStatus, Converter={StaticResource StatusLevelToBrushConverter}}"/>
+                        </Grid>
+                        <TextBlock Style="{StaticResource SecondaryTextStyle}">
+                            <Run Text="CPU:"/><Run Text="{Binding CpuDisplay, Mode=OneWay}"/>
+                            <LineBreak/>
+                            <Run Text="RAM:"/><Run Text="{Binding RamDisplay, Mode=OneWay}"/>
+                            <LineBreak/>
+                            <Run Text="Disk:"/><Run Text="{Binding DiskDisplay, Mode=OneWay}"/>
+                            <LineBreak/>
+                            <Run Text="GPU:"/><Run Text="{Binding GpuDisplay, Mode=OneWay}"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource SecondaryTextStyle}" Visibility="{Binding IsAdvancedMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Run Text="RAM detail:"/><Run Text="{Binding RamDetailDisplay, Mode=OneWay}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Temperature -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,8,0">
+                    <StackPanel>
+                        <Grid>
+                            <TextBlock Text="Temperature" Style="{StaticResource MetricLabelStyle}"
+                                       ToolTip="CPU temperature, when your system's firmware reports it to Windows. GPU temperature isn't exposed without a vendor tool."/>
+                            <Ellipse Width="10" Height="10" HorizontalAlignment="Right" Fill="{Binding TemperatureStatus, Converter={StaticResource StatusLevelToBrushConverter}}"/>
+                        </Grid>
+                        <TextBlock Style="{StaticResource SecondaryTextStyle}">
+                            <Run Text="CPU:"/><Run Text="{Binding CpuTempDisplay, Mode=OneWay}"/>
+                            <LineBreak/>
+                            <Run Text="GPU:"/><Run Text="{Binding GpuTempDisplay, Mode=OneWay}"/>
+                            <LineBreak/>
+                            <Run Text="Throttling:"/><Run Text="{Binding ThrottleDisplay, Mode=OneWay}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Roblox -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Roblox" Style="{StaticResource MetricLabelStyle}"/>
+                        <TextBlock Text="{Binding RobloxStatusDisplay}" Style="{StaticResource SecondaryTextStyle}"/>
+                    </StackPanel>
+                </Border>
+
+            </UniformGrid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>RobloxOptimizer.App</RootNamespace>
+    <AssemblyName>RobloxOptimizer</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Description>Roblox Performance Optimizer - a transparent, reversible, safe Windows performance helper for Roblox.</Description>
+    <!-- The app never auto-elevates (see app.manifest requestedExecutionLevel="asInvoker"). -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RobloxOptimizer.Core\RobloxOptimizer.Core.csproj" />
+    <ProjectReference Include="..\RobloxOptimizer.Monitoring\RobloxOptimizer.Monitoring.csproj" />
+    <ProjectReference Include="..\RobloxOptimizer.Network\RobloxOptimizer.Network.csproj" />
+    <ProjectReference Include="..\RobloxOptimizer.RobloxIntegration\RobloxOptimizer.RobloxIntegration.csproj" />
+    <ProjectReference Include="..\RobloxOptimizer.Optimization\RobloxOptimizer.Optimization.csproj" />
+    <ProjectReference Include="..\RobloxOptimizer.Backup\RobloxOptimizer.Backup.csproj" />
+    <ProjectReference Include="..\RobloxOptimizer.Logging\RobloxOptimizer.Logging.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>false</UseWindowsForms>
+    <RootNamespace>RobloxOptimizer.Monitoring</RootNamespace>
+    <AssemblyName>RobloxOptimizer.Monitoring</AssemblyName>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <Description>CPU/RAM/disk/GPU usage, temperature, thermal-throttle detection, and best-effort per-process FPS tracing.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.1" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.16" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RobloxOptimizer.Core\RobloxOptimizer.Core.csproj" />
+  </ItemGroup>
+
+</Project>

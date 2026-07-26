@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>RobloxOptimizer.Backup</RootNamespace>
+    <AssemblyName>RobloxOptimizer.Backup</AssemblyName>
+    <Description>JSON settings-backup snapshot (Undo/Restore Defaults) and best-effort System Restore point creation.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RobloxOptimizer.Core\RobloxOptimizer.Core.csproj" />
+  </ItemGroup>
+
+</Project>

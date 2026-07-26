@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>RobloxOptimizer.Logging</RootNamespace>
+    <AssemblyName>RobloxOptimizer.Logging</AssemblyName>
+    <Description>Local, append-only audit log of every setting RPO has changed. Stored under %LOCALAPPDATA%\RobloxOptimizer - never transmitted anywhere.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RobloxOptimizer.Core\RobloxOptimizer.Core.csproj" />
+  </ItemGroup>
+
+</Project>
