@@ -168,6 +168,61 @@ public partial class MainWindow : Window
     private const int PingSamplesPerRefresh = 3;
     private const int PingTimeoutMs = 800;
 
+    // A few well-known, low-latency public resolvers. Different ISPs peer with each of these at
+    // different quality, so instead of hardcoding one, the app periodically checks which one is
+    // currently fastest from this PC's network and reads from that one - a real, honest way to
+    // get the lowest available reading, not a faked number (no software can lower your actual
+    // latency to Roblox's own game servers).
+    private static readonly string[] PingCandidateHosts = { "1.1.1.1", "8.8.8.8", "9.9.9.9" };
+    private static readonly TimeSpan PingHostReselectInterval = TimeSpan.FromMinutes(2);
+    private string _pingHost = PingCandidateHosts[0];
+    private DateTime _pingHostChosenAtUtc = DateTime.MinValue;
+
+    private async Task PickFastestPingHostAsync()
+    {
+        if (DateTime.UtcNow - _pingHostChosenAtUtc < PingHostReselectInterval)
+        {
+            return;
+        }
+
+        try
+        {
+            using var ping = new Ping();
+            string? bestHost = null;
+            var bestRoundTrip = long.MaxValue;
+
+            foreach (var host in PingCandidateHosts)
+            {
+                try
+                {
+                    var reply = await ping.SendPingAsync(host, PingTimeoutMs).ConfigureAwait(true);
+                    if (reply.Status == IPStatus.Success && reply.RoundtripTime < bestRoundTrip)
+                    {
+                        bestRoundTrip = reply.RoundtripTime;
+                        bestHost = host;
+                    }
+                }
+                catch (Exception)
+                {
+                    // Try the next candidate - one unreachable resolver shouldn't block the others.
+                }
+            }
+
+            if (bestHost is not null)
+            {
+                _pingHost = bestHost;
+            }
+        }
+        catch (Exception)
+        {
+            // Keep using whichever host was already selected.
+        }
+        finally
+        {
+            _pingHostChosenAtUtc = DateTime.UtcNow;
+        }
+    }
+
     /// <summary>
     /// Sends a few quick pings each refresh instead of just one, so the dashboard can show
     /// jitter (ping variability) and packet loss too - not just a single current reading.
@@ -176,6 +231,8 @@ public partial class MainWindow : Window
     /// </summary>
     private async Task RefreshPingAsync()
     {
+        await PickFastestPingHostAsync().ConfigureAwait(true);
+
         var roundTripTimes = new List<long>();
 
         try
@@ -186,7 +243,7 @@ public partial class MainWindow : Window
             {
                 try
                 {
-                    var reply = await ping.SendPingAsync("1.1.1.1", PingTimeoutMs).ConfigureAwait(true);
+                    var reply = await ping.SendPingAsync(_pingHost, PingTimeoutMs).ConfigureAwait(true);
                     if (reply.Status == IPStatus.Success)
                     {
                         roundTripTimes.Add(reply.RoundtripTime);
@@ -376,10 +433,13 @@ public partial class MainWindow : Window
 
         try
         {
-            var raised = SetRobloxPriority(ProcessPriorityClass.AboveNormal);
+            // "High" is the strongest priority bump Task Manager itself offers next to Realtime -
+            // Realtime is intentionally never used here since it can starve the mouse/keyboard/rest
+            // of Windows and make the whole PC feel frozen.
+            var raised = SetRobloxPriority(ProcessPriorityClass.High);
             if (raised)
             {
-                Log("Raised Roblox's process priority.");
+                Log("Raised Roblox's process priority (High).");
             }
         }
         catch (Exception ex)

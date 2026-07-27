@@ -26,6 +26,11 @@ public partial class MainWindow
     private const int VoiceChannels = 1;
     private static readonly TimeSpan RecordingDuration = TimeSpan.FromSeconds(5);
 
+    // Linear gain applied to every effect (record-and-play and live) so the processed voice comes
+    // through noticeably louder than the raw mic signal. 2.0x is roughly +6 dB; loud peaks clamp
+    // instead of wrapping, which is the standard, safe way to boost volume in software.
+    private const double VoiceGainBoost = 2.0;
+
     private WaveInEvent? _waveIn;
     private WaveOutEvent? _waveOut;
     private DispatcherTimer? _recordingStopTimer;
@@ -156,6 +161,7 @@ public partial class MainWindow
         {
             StopPlayback();
             var robotPcm = ApplyRingModulation(_recordedPcm, VoiceSampleRate, carrierHz: 60);
+            ApplyGainInPlace(robotPcm, VoiceGainBoost);
             PlayRawPcm(robotPcm, VoiceSampleRate, "Robot");
         }
         catch (Exception ex)
@@ -174,7 +180,9 @@ public partial class MainWindow
         try
         {
             StopPlayback();
-            PlayRawPcm(_recordedPcm, declaredSampleRate, label);
+            var boosted = (byte[])_recordedPcm.Clone();
+            ApplyGainInPlace(boosted, VoiceGainBoost);
+            PlayRawPcm(boosted, declaredSampleRate, label);
         }
         catch (Exception ex)
         {
@@ -264,6 +272,19 @@ public partial class MainWindow
         }
 
         return result;
+    }
+
+    /// <summary>Multiplies every sample by a fixed gain, clamped to 16-bit range - the loudness boost used by every effect above and below.</summary>
+    private static void ApplyGainInPlace(byte[] pcm16Mono, double gain)
+    {
+        for (var i = 0; i + 1 < pcm16Mono.Length; i += 2)
+        {
+            var sample = BitConverter.ToInt16(pcm16Mono, i);
+            var boosted = (short)Math.Clamp(sample * gain, short.MinValue, short.MaxValue);
+            var bytes = BitConverter.GetBytes(boosted);
+            pcm16Mono[i] = bytes[0];
+            pcm16Mono[i + 1] = bytes[1];
+        }
     }
 
     // ================= Live Voice Changer =================
@@ -437,24 +458,26 @@ public partial class MainWindow
             return;
         }
 
+        byte[] processed;
         switch (_selectedLiveEffect)
         {
             case VoiceEffectMode.Robot:
-                var robotBytes = ApplyRingModulationContinuous(e.Buffer, e.BytesRecorded, VoiceSampleRate);
-                buffer.AddSamples(robotBytes, 0, robotBytes.Length);
+                processed = ApplyRingModulationContinuous(e.Buffer, e.BytesRecorded, VoiceSampleRate);
                 break;
             case VoiceEffectMode.Deep:
-                var deepBytes = ApplyBlockPitchShift(e.Buffer, e.BytesRecorded, 0.75);
-                buffer.AddSamples(deepBytes, 0, deepBytes.Length);
+                processed = ApplyBlockPitchShift(e.Buffer, e.BytesRecorded, 0.75);
                 break;
             case VoiceEffectMode.High:
-                var highBytes = ApplyBlockPitchShift(e.Buffer, e.BytesRecorded, 1.4);
-                buffer.AddSamples(highBytes, 0, highBytes.Length);
+                processed = ApplyBlockPitchShift(e.Buffer, e.BytesRecorded, 1.4);
                 break;
             default:
-                buffer.AddSamples(e.Buffer, 0, e.BytesRecorded);
+                processed = new byte[e.BytesRecorded];
+                Array.Copy(e.Buffer, processed, e.BytesRecorded);
                 break;
         }
+
+        ApplyGainInPlace(processed, VoiceGainBoost);
+        buffer.AddSamples(processed, 0, processed.Length);
     }
 
     /// <summary>Ring modulation with a phase counter that keeps advancing across calls, so consecutive chunks don't click at the seams.</summary>

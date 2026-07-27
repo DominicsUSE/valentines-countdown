@@ -13,14 +13,21 @@ firewall/Windows Update, and every change has an Undo.
   and ping to a public Internet server - current latency plus jitter and
   packet loss from 3 quick samples each refresh (a general connection
   check, not your exact Roblox server ping - it's labeled that way in the
-  app; nothing can discover that).
+  app; nothing can discover that). Every couple of minutes the app quickly
+  checks a few well-known low-latency resolvers (1.1.1.1 / 8.8.8.8 / 9.9.9.9)
+  and keeps reading from whichever is currently fastest for your connection,
+  so the number shown is always the best real reading available - not a
+  faked-lower one. No app can reduce your actual network latency to
+  Roblox's own game servers; that depends on your ISP, Wi-Fi vs. Ethernet,
+  and the specific server/region the game puts you on.
 - **Optimize for Roblox** (one button):
   - Switches Windows to the "High performance" power plan.
   - Turns off the Xbox Game Bar overlay (Settings > Gaming > Xbox Game Bar -
     the same switch, just flipped from the app).
   - If Roblox is open: sets it to use your dedicated graphics card (on
-    laptops/PCs with two GPUs) and slightly raises its process priority
-    (never to Realtime).
+    laptops/PCs with two GPUs) and raises its process priority to **High**
+    (one step below Realtime, which is deliberately never used since it can
+    make the rest of the PC feel frozen).
 - **Undo Changes** (one button): puts all of the above back exactly how it
   was.
 
@@ -41,6 +48,11 @@ Undo still works.
   in live mode use a lightweight per-chunk resampling trick to keep timing
   in sync, so they can sound a bit more textured than the pre-recorded
   version above; "Robot" sounds the same either way.
+- **Louder output**: every effect (recorded playback and live) applies a
+  built-in ~2x volume boost before it's played, so the processed voice
+  comes through noticeably louder than your raw mic input. Very loud
+  peaks are clamped rather than distorted/wrapped - the normal, safe way
+  software raises loudness.
 - To have a live-changed voice actually heard inside Roblox's (or
   Discord's) voice chat: install a free virtual audio cable app yourself
   (e.g. VB-CABLE - not bundled with this project), pick it as the Live
