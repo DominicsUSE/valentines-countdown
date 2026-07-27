@@ -74,6 +74,13 @@ Undo still works.
 - **Test output device**: plays a short tone on whichever output device
   is selected, independent of your microphone - confirms a virtual audio
   cable is wired up correctly without needing to talk or open Roblox.
+- **Check My Setup**: a self-serve diagnostic for "I set it up but the
+  other app still doesn't hear it" - checks whether a virtual cable is
+  installed and whether it's the one selected as the output device above
+  (the two things this app can actually see), and is explicit that the
+  third thing - whether Roblox/Telegram/etc.'s own microphone setting
+  points at that same cable - lives entirely inside that other app, so
+  only you can check/change it there.
 - To have a live-changed voice actually heard inside Roblox, Discord,
   Telegram, Zoom, Teams, Skype, or any other app's voice chat/calls **on
   this PC**: install a free virtual audio cable app yourself (e.g.

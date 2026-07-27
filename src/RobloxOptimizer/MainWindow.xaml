@@ -316,6 +316,12 @@
                                            AutomationProperties.Name="Live voice changer status"
                                            AutomationProperties.LiveSetting="Polite"/>
 
+                                <Button x:Name="CheckSetupButton" Content="&#128269; Chec_k My Setup" Style="{StaticResource SecondaryButtonStyle}"
+                                        HorizontalAlignment="Left" Margin="0,0,0,10" Click="CheckSetupButton_Click"
+                                        ToolTip="Checks whether a virtual audio cable is installed and whether it's selected as the output device above - the two most common reasons Roblox/Telegram/etc. don't hear the changed voice."
+                                        AutomationProperties.Name="Check my voice changer setup"
+                                        AutomationProperties.HelpText="Checks whether a virtual audio cable is installed and whether it's selected as the output device above - the two most common reasons another app doesn't hear the changed voice. Keyboard shortcut: Alt+K."/>
+
                                 <Button x:Name="HowToRouteButton" Content="&#8505; _How do I use this in other apps/calls?" Style="{StaticResource SecondaryButtonStyle}"
                                         HorizontalAlignment="Left" Click="HowToRouteButton_Click"
                                         ToolTip="Step-by-step instructions for routing the live voice changer into any other app's voice chat or calls using a free virtual audio cable app."

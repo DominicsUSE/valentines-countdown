@@ -396,6 +396,70 @@ public partial class MainWindow
         return result;
     }
 
+    /// <summary>
+    /// Self-serve diagnostic for the single most common support question: "I set it up but the
+    /// other app still doesn't hear it." Checks the two things this app CAN see (whether a virtual
+    /// cable exists, and whether it's the one selected above) and is explicit that the third thing -
+    /// whether the destination app's own microphone setting points at the same cable - is something
+    /// this app has no way to read or change, since that setting lives entirely inside that other app.
+    /// </summary>
+    private void CheckSetupButton_Click(object sender, RoutedEventArgs e)
+    {
+        var cableLikeNames = string.Empty;
+        var cableCount = 0;
+
+        try
+        {
+            for (var i = 0; i < WaveOut.DeviceCount; i++)
+            {
+                var name = WaveOut.GetCapabilities(i).ProductName;
+                if (LooksLikeVirtualCable(name))
+                {
+                    cableLikeNames += (cableCount > 0 ? ", " : string.Empty) + name;
+                    cableCount++;
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Best effort - fall through to the "not found" message below.
+        }
+
+        var selectedName = LiveOutputDeviceCombo.SelectedItem as string ?? "Default output device";
+        var selectedLooksLikeCable = LooksLikeVirtualCable(selectedName);
+
+        string message;
+        if (cableCount == 0)
+        {
+            message = "No virtual audio cable (like VB-CABLE or VoiceMeeter) was found on this PC. " +
+                "Roblox, Telegram, and every other app can only hear your real microphone until you " +
+                "install one - click \"How do I use this in other apps/calls?\" below for the steps.";
+        }
+        else if (!selectedLooksLikeCable)
+        {
+            message = "Found a virtual cable (" + cableLikeNames + ") but the \"Output device\" " +
+                "above is currently set to \"" + selectedName + "\" - that's your regular speakers, " +
+                "not the cable. Pick the cable in the dropdown above, then click Start Live Voice " +
+                "Changer again.";
+        }
+        else
+        {
+            message = "This app is set to play into \"" + selectedName + "\" - that half is done. " +
+                "The one thing this app has no way to see or change is the OTHER side: open Roblox's " +
+                "or Telegram's own microphone settings (inside that app, not this one) and make sure " +
+                "THEY are set to the matching cable output (often named similarly, e.g. \"CABLE " +
+                "Output\"), then restart that app. Both sides have to point at the same cable, and " +
+                "only you can set the destination app's side - no app can read or change another " +
+                "app's settings.";
+        }
+
+        MessageBox.Show(this, message, "Voice changer setup check", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private static bool LooksLikeVirtualCable(string deviceName) =>
+        deviceName.Contains("cable", StringComparison.OrdinalIgnoreCase) ||
+        deviceName.Contains("voicemeeter", StringComparison.OrdinalIgnoreCase);
+
     private void HowToRouteButton_Click(object sender, RoutedEventArgs e)
     {
         MessageBox.Show(this,
