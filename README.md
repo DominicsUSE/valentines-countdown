@@ -74,15 +74,18 @@ Undo still works.
 - **Test output device**: plays a short tone on whichever output device
   is selected, independent of your microphone - confirms a virtual audio
   cable is wired up correctly without needing to talk or open Roblox.
-- To have a live-changed voice actually heard inside Roblox's (or
-  Discord's) voice chat: install a free virtual audio cable app yourself
-  (e.g. VB-CABLE - not bundled with this project), pick it as the Live
-  Voice Changer's output device, then select that same cable as your
-  microphone in Roblox's voice settings. The **"How do I make Roblox hear
-  this?"** button on the Voice Effects tab walks through these exact
-  steps - without them, picking your normal speakers only lets you hear
-  the effect yourself, since Windows doesn't let one app silently replace
-  another app's microphone.
+- To have a live-changed voice actually heard inside Roblox, Discord,
+  Zoom, Teams, Skype, or any other app's voice chat/calls **on this PC**:
+  install a free virtual audio cable app yourself (e.g. VB-CABLE - not
+  bundled with this project), pick it as the Live Voice Changer's output
+  device, then select that same cable as your microphone in that other
+  app's own settings. The **"How do I use this in Discord/Zoom/calls?"**
+  button on the Voice Effects tab walks through these exact steps -
+  without them, picking your normal speakers only lets you hear the
+  effect yourself, since Windows doesn't let one app silently replace
+  another app's microphone. This can't reach an actual call on your
+  phone's cellular network - that's separate hardware this PC has no
+  access to.
 
 ## What it will never do
 
@@ -99,11 +102,13 @@ Undo still works.
 - Clone or impersonate any real person's voice (political figures included).
   The Voice Effects tab only does generic pitch/robot effects - never a
   specific real person.
-- Feed a changed voice into Roblox's (or any other app's) voice chat by
-  itself - Windows doesn't allow one app to replace another app's
-  microphone input without a virtual audio cable driver, and this app
-  doesn't install one for you. Pair it yourself with a well-known free tool
-  like VB-Audio Virtual Cable if you want that.
+- Feed a changed voice into Roblox's, Discord's, Zoom's, or any other
+  app's voice chat/calls by itself - Windows doesn't allow one app to
+  replace another app's microphone input without a virtual audio cable
+  driver, and this app doesn't install one for you. Pair it yourself with
+  a well-known free tool like VB-Audio Virtual Cable if you want that. It
+  also can't reach an actual call on your phone's cellular network -
+  that's separate hardware entirely, not something any PC app can touch.
 - Promise a specific FPS number or "zero ping" - performance still depends
   on your hardware, your internet connection, and the specific Roblox
   experience/server you're in.
@@ -127,14 +132,14 @@ Undo still works.
 ## Get a ready-to-run copy without installing anything
 
 Every push to this branch automatically builds a Windows `.exe` via GitHub
-Actions - no need to install the .NET SDK just to try it:
+Actions and publishes it as a public GitHub Release asset - no GitHub
+sign-in and no .NET SDK install required to try it:
 
-1. Open this repository on GitHub and click the **Actions** tab.
-2. Open the latest **"Build Roblox Optimizer (Windows)"** run (or click
-   **Run workflow** to start one on demand).
-3. Once it finishes (~1-2 minutes), download the **RobloxOptimizer-win-x64**
-   artifact - it's a zip containing one self-contained `RobloxOptimizer.exe`
-   you can run directly, no install required.
+**<https://github.com/DominicsUSE/valentines-countdown/releases/download/latest-build/RobloxOptimizer.exe>**
+
+That link always points at the newest build (the `latest-build` release is
+replaced on every push) - just download `RobloxOptimizer.exe` and run it
+directly, no install or zip extraction required.
 
 Windows SmartScreen may warn about an unsigned executable from an unknown
 publisher the first time you run it (`More info` > `Run anyway`) - that's

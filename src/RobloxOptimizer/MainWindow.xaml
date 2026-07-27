@@ -202,10 +202,11 @@
                                 <TextBlock Text="&#127908; For fun only" FontWeight="SemiBold" Margin="0,0,0,6"/>
                                 <TextBlock Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap">
                                     Record a few seconds of your mic, then play it back with a fun effect through your
-                                    speakers/headphones. This does not impersonate any real person's voice, and it
-                                    doesn't feed into Roblox's voice chat - actually routing a changed voice into a
-                                    game requires installing a separate virtual audio cable app, which isn't included
-                                    here. See the tip at the bottom of this tab if you want to set that up yourself.
+                                    speakers/headphones. This does not impersonate any real person's voice, and by
+                                    itself it doesn't feed into Roblox, Discord, Zoom, Teams, or any other app's voice
+                                    chat/calls - actually routing a changed voice into another app on this PC requires
+                                    installing a separate virtual audio cable app, which isn't included here. See the
+                                    tip at the bottom of this tab if you want to set that up yourself.
                                 </TextBlock>
                             </StackPanel>
                         </Border>
@@ -267,10 +268,13 @@
                                 <TextBlock Text="&#128266; Live Voice Changer" FontWeight="SemiBold" Margin="0,0,0,6"/>
                                 <TextBlock Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap" Margin="0,0,0,10">
                                     Continuously processes your mic while running, instead of record-then-play. To
-                                    actually use it inside Roblox voice chat automatically, install a free virtual
-                                    audio cable app yourself (e.g. VB-CABLE), pick it as the output device below, then
-                                    select that same cable as your microphone in Roblox's voice settings. Otherwise,
-                                    pick your normal speakers/headphones below to just hear the effect on yourself.
+                                    actually use it in Roblox, Discord, Zoom, Teams, Skype, or any other app's voice
+                                    chat/calls on this PC, install a free virtual audio cable app yourself (e.g.
+                                    VB-CABLE), pick it as the output device below, then select that same cable as your
+                                    microphone inside that other app's settings. Otherwise, pick your normal
+                                    speakers/headphones below to just hear the effect on yourself. This can't reach an
+                                    actual call on your phone's cellular network - that's separate hardware this PC
+                                    has no access to.
                                 </TextBlock>
 
                                 <TextBlock Text="Effect" Style="{StaticResource SecondaryTextStyle}" Margin="0,0,0,4"/>
@@ -312,19 +316,21 @@
                                            AutomationProperties.Name="Live voice changer status"
                                            AutomationProperties.LiveSetting="Polite"/>
 
-                                <Button x:Name="HowToRouteButton" Content="&#8505; _How do I make Roblox hear this?" Style="{StaticResource SecondaryButtonStyle}"
+                                <Button x:Name="HowToRouteButton" Content="&#8505; _How do I use this in Discord/Zoom/calls?" Style="{StaticResource SecondaryButtonStyle}"
                                         HorizontalAlignment="Left" Click="HowToRouteButton_Click"
-                                        ToolTip="Step-by-step instructions for routing the live voice changer into Roblox's voice chat using a free virtual audio cable app."
-                                        AutomationProperties.Name="How do I make Roblox hear this"
-                                        AutomationProperties.HelpText="Shows step-by-step instructions for routing the live voice changer into Roblox's voice chat using a free virtual audio cable app you install yourself. Keyboard shortcut: Alt+H."/>
+                                        ToolTip="Step-by-step instructions for routing the live voice changer into any other app's voice chat or calls using a free virtual audio cable app."
+                                        AutomationProperties.Name="How do I use this in other apps"
+                                        AutomationProperties.HelpText="Shows step-by-step instructions for routing the live voice changer into Roblox, Discord, Zoom, Teams, Skype, or any other app's voice chat or calls, using a free virtual audio cable app you install yourself. Keyboard shortcut: Alt+H."/>
                             </StackPanel>
                         </Border>
 
                         <TextBlock Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap" FontSize="12">
-                            Tip: to use a changed voice inside Roblox (or Discord) voice chat, install a virtual audio
-                            cable app (e.g. VB-CABLE), set your changed-voice output to play into it, then pick that
-                            cable as your microphone inside Roblox's voice settings. This app doesn't install or
-                            bundle anything like that for you.
+                            Tip: to use a changed voice inside Roblox, Discord, Zoom, Teams, Skype, or any other app's
+                            voice chat/calls, install a virtual audio cable app (e.g. VB-CABLE), set your
+                            changed-voice output to play into it, then pick that cable as your microphone inside that
+                            app's own settings. Works for any app running on this PC; it can't reach an actual call
+                            on your phone's cellular network. This app doesn't install or bundle anything like that
+                            for you.
                         </TextBlock>
 
                     </StackPanel>
