@@ -516,6 +516,55 @@ public partial class MainWindow : Window
         DeleteBackupFile();
     }
 
+    // A curated, well-known list of consumer apps that are safe to ask to close while gaming -
+    // deliberately NOT a generic "kill anything using a lot of RAM" scan, since that could just as
+    // easily catch antivirus, VPN, or backup software and cause real harm.
+    private static readonly string[] CommonBackgroundAppProcessNames =
+    {
+        "Discord", "Spotify", "Steam", "EpicGamesLauncher", "chrome", "msedge", "firefox", "Slack", "Teams"
+    };
+
+    private void CloseBackgroundAppsButton_Click(object sender, RoutedEventArgs e)
+    {
+        var closedAny = false;
+
+        foreach (var name in CommonBackgroundAppProcessNames)
+        {
+            var processes = Process.GetProcessesByName(name);
+            try
+            {
+                foreach (var process in processes)
+                {
+                    try
+                    {
+                        // CloseMainWindow sends a graceful "please close" request (the app can still
+                        // show its own "save changes?" prompt) - never a forced Kill().
+                        if (process.MainWindowHandle != IntPtr.Zero && process.CloseMainWindow())
+                        {
+                            Log($"Asked {name} to close.");
+                            closedAny = true;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // Some processes deny another app permission to close them - skip and move on.
+                    }
+                }
+            }
+            finally
+            {
+                foreach (var process in processes)
+                {
+                    process.Dispose();
+                }
+            }
+        }
+
+        Log(closedAny
+            ? "Done - freed-up CPU/RAM should help Roblox's FPS. Nothing else running was touched."
+            : "Didn't find any of the common background apps (Discord, Spotify, Steam, browsers, Slack, Teams) currently running.");
+    }
+
     private static bool SetRobloxPriority(ProcessPriorityClass priority)
     {
         var processes = Process.GetProcessesByName(RobloxProcessName);

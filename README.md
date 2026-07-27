@@ -30,6 +30,20 @@ firewall/Windows Update, and every change has an Undo.
     make the rest of the PC feel frozen).
 - **Undo Changes** (one button): puts all of the above back exactly how it
   was.
+- **Boost FPS** card:
+  - **Close Background Apps**: gracefully asks a curated list of common
+    consumer apps (Discord, Spotify, Steam, Chrome/Edge/Firefox, Slack,
+    Teams) to close, if they're running, freeing up CPU/RAM for Roblox.
+    This is a polite "please close" request (`CloseMainWindow`), never a
+    forced kill, so any of them can still show their own save prompt - and
+    it deliberately never scans for or touches anything outside that list
+    (a generic "kill whatever's using RAM" scan could just as easily catch
+    antivirus, VPN, or backup software).
+  - A tip pointing at **Roblox's own** Graphics Quality slider (gear icon
+    &rarr; Settings) for lowering mesh/shadow/texture detail, and Roblox's
+    own Shift+F5 overlay for a live in-game FPS/ping counter - this app
+    never edits Roblox's files or FastFlags itself (see "What it will
+    never do" below).
 
 All of this is stored under `HKEY_CURRENT_USER`, so none of it requires an
 admin prompt. If you close the app (or it crashes) while changes are still
@@ -57,7 +71,11 @@ Undo still works.
   Discord's) voice chat: install a free virtual audio cable app yourself
   (e.g. VB-CABLE - not bundled with this project), pick it as the Live
   Voice Changer's output device, then select that same cable as your
-  microphone in Roblox's voice settings.
+  microphone in Roblox's voice settings. The **"How do I make Roblox hear
+  this?"** button on the Voice Effects tab walks through these exact
+  steps - without them, picking your normal speakers only lets you hear
+  the effect yourself, since Windows doesn't let one app silently replace
+  another app's microphone.
 
 ## What it will never do
 

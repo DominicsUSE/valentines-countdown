@@ -302,6 +302,26 @@ public partial class MainWindow
 
     private void RefreshDevicesButton_Click(object sender, RoutedEventArgs e) => PopulateOutputDevices();
 
+    private void HowToRouteButton_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(this,
+            "Picking your normal speakers above only lets YOU hear the effect - Windows doesn't let " +
+            "one app silently replace another app's microphone, so Roblox can't hear it that way. " +
+            "Here's the actual path other voice-changer apps use too:\n\n" +
+            "1. Install a free virtual audio cable app yourself, e.g. VB-CABLE from vb-audio.com " +
+            "(not included here - it installs its own audio driver, so Windows will ask you to " +
+            "approve that install).\n\n" +
+            "2. Restart this app (and Roblox, if it's already open) so both see the new device.\n\n" +
+            "3. In the \"Output device\" dropdown above, click the refresh button and pick the " +
+            "cable's input (e.g. \"CABLE Input\"), then click Start Live Voice Changer.\n\n" +
+            "4. In Roblox's own voice/microphone settings, pick the cable's output (e.g. \"CABLE " +
+            "Output\") as your microphone.\n\n" +
+            "5. Talk normally - Roblox now hears the live-changed voice instead of your real mic.",
+            "Routing the live voice changer into Roblox",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
+    }
+
     private void PopulateOutputDevices()
     {
         var previousSelection = LiveOutputDeviceCombo.SelectedIndex;

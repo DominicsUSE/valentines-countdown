@@ -154,6 +154,28 @@
                                     AutomationProperties.HelpText="Puts every setting Optimize changed back to what it was before. Keyboard shortcut: Alt+U."/>
                         </StackPanel>
 
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="&#128200; Boost FPS" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                                <TextBlock Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap" Margin="0,0,0,10">
+                                    Two more real ways to raise FPS: free up CPU/RAM here, and lower detail inside
+                                    Roblox itself - this app never touches Roblox's own files or settings, so that
+                                    part has to happen in Roblox's own menu.
+                                </TextBlock>
+                                <Button x:Name="CloseBackgroundAppsButton" Content="&#129513; _Close Background Apps" Style="{StaticResource SecondaryButtonStyle}"
+                                        HorizontalAlignment="Left" Margin="0,0,0,10" Click="CloseBackgroundAppsButton_Click"
+                                        ToolTip="Gracefully asks common background apps (Discord, Spotify, Steam, browsers, Slack, Teams) to close if they're running, freeing up CPU/RAM for Roblox. Each app can still show its own save prompt - nothing is force-killed."
+                                        AutomationProperties.Name="Close background apps"
+                                        AutomationProperties.HelpText="Gracefully asks common background apps like Discord, Spotify, Steam, browsers, Slack, and Teams to close if they're running, to free up CPU and RAM for Roblox. Nothing is force-killed. Keyboard shortcut: Alt+C."/>
+                                <TextBlock Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap" FontSize="12">
+                                    Lower meshes/shadows/textures for more FPS: in Roblox, click the gear icon &#8594;
+                                    Settings &#8594; uncheck "Auto" &#8594; drag the Graphics Quality slider down.
+                                    Press Shift+F5 in-game any time to see Roblox's own live FPS/ping counter, so
+                                    you can see the effect immediately.
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
                         <Border Style="{StaticResource CardStyle}" Margin="0,0,0,0">
                             <StackPanel>
                                 <TextBlock Text="Activity log" FontWeight="SemiBold" Margin="0,0,0,8"/>
@@ -256,10 +278,16 @@
                                         AutomationProperties.Name="Start or stop the live voice changer"
                                         AutomationProperties.HelpText="Continuously applies the selected effect to your microphone and sends it to the chosen output device, until you stop it. Keyboard shortcut: Alt+S."/>
 
-                                <TextBlock x:Name="LiveStatusText" Text="Live voice changer is off." Margin="0,10,0,0"
+                                <TextBlock x:Name="LiveStatusText" Text="Live voice changer is off." Margin="0,10,0,10"
                                            Style="{StaticResource SecondaryTextStyle}"
                                            AutomationProperties.Name="Live voice changer status"
                                            AutomationProperties.LiveSetting="Polite"/>
+
+                                <Button x:Name="HowToRouteButton" Content="&#8505; _How do I make Roblox hear this?" Style="{StaticResource SecondaryButtonStyle}"
+                                        HorizontalAlignment="Left" Click="HowToRouteButton_Click"
+                                        ToolTip="Step-by-step instructions for routing the live voice changer into Roblox's voice chat using a free virtual audio cable app."
+                                        AutomationProperties.Name="How do I make Roblox hear this"
+                                        AutomationProperties.HelpText="Shows step-by-step instructions for routing the live voice changer into Roblox's voice chat using a free virtual audio cable app you install yourself. Keyboard shortcut: Alt+H."/>
                             </StackPanel>
                         </Border>
 
