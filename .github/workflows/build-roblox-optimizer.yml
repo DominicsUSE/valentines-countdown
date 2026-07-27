@@ -1,9 +1,10 @@
 name: Build Roblox Optimizer (Windows)
 
-# Builds a ready-to-run Windows executable so you don't need the .NET SDK
-# installed locally just to try the app. After a run finishes, open it from
-# the "Actions" tab on GitHub and download the "RobloxOptimizer-win-x64" zip
-# under "Artifacts".
+# Builds a ready-to-run Windows executable and publishes it as a GitHub
+# Release asset (a plain, public download link - unlike the "Artifacts"
+# section, GitHub does NOT require you to be signed in to download a
+# release asset from a public repo). Every push replaces the "latest-build"
+# release with the newest .exe.
 
 on:
   push:
@@ -13,6 +14,9 @@ on:
       - "src/RobloxOptimizer/**"
       - ".github/workflows/build-roblox-optimizer.yml"
   workflow_dispatch: {}
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -36,9 +40,22 @@ jobs:
           -p:IncludeNativeLibrariesForSelfExtract=true
           -o publish
 
-      - name: Upload the executable as a build artifact
+      - name: Upload the executable as a build artifact (backup / CI history)
         uses: actions/upload-artifact@v4
         with:
           name: RobloxOptimizer-win-x64
           path: publish/RobloxOptimizer.exe
           if-no-files-found: error
+
+      - name: Publish (or replace) the "latest-build" GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest-build --yes --cleanup-tag --repo "${{ github.repository }}" || true
+          gh release create latest-build publish/RobloxOptimizer.exe \
+            --repo "${{ github.repository }}" \
+            --target "${{ github.sha }}" \
+            --title "Latest build (auto-updated)" \
+            --notes "Automatically built from commit ${{ github.sha }}. This is a rolling build of the claude/roblox-performance-optimizer-lv27xz branch, not a stable versioned release - it gets replaced on every push. Download RobloxOptimizer.exe below - no GitHub sign-in required." \
+            --prerelease
