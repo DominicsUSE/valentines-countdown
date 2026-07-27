@@ -10,8 +10,10 @@ firewall/Windows Update, and every change has an Undo.
 **Optimize tab**
 
 - **Live status**: whether Roblox is running, current CPU and RAM usage,
-  and ping to a public Internet server (a general connection check, not
-  your exact Roblox server ping - it's labeled that way in the app).
+  and ping to a public Internet server - current latency plus jitter and
+  packet loss from 3 quick samples each refresh (a general connection
+  check, not your exact Roblox server ping - it's labeled that way in the
+  app; nothing can discover that).
 - **Optimize for Roblox** (one button):
   - Switches Windows to the "High performance" power plan.
   - Turns off the Xbox Game Bar overlay (Settings > Gaming > Xbox Game Bar -
@@ -30,19 +32,33 @@ Undo still works.
 
 **Voice Effects tab**
 
-Record 5 seconds from your mic, then play it back through your speakers
-with a fun effect: Normal, Deep Voice, High Voice, or Robot. It's a novelty
-feature, not a real microphone replacement - see "What it will never do"
-below for exactly why, and what would actually be involved if you want a
-changed voice inside Roblox's own voice chat.
+- **Record & play back**: record 5 seconds from your mic, then play it back
+  through your speakers with a fun effect (Normal, Deep, High, Robot).
+- **Live Voice Changer**: continuously applies the selected effect to your
+  mic in real time and sends it to whichever output device you pick from
+  the dropdown - your normal speakers by default, or a virtual audio cable
+  if you've installed one (see the tip in the app / below). "Deep"/"High"
+  in live mode use a lightweight per-chunk resampling trick to keep timing
+  in sync, so they can sound a bit more textured than the pre-recorded
+  version above; "Robot" sounds the same either way.
+- To have a live-changed voice actually heard inside Roblox's (or
+  Discord's) voice chat: install a free virtual audio cable app yourself
+  (e.g. VB-CABLE - not bundled with this project), pick it as the Live
+  Voice Changer's output device, then select that same cable as your
+  microphone in Roblox's voice settings.
 
 ## What it will never do
 
 - Ask for administrator rights.
 - Touch antivirus software, the Windows Firewall, or Windows Update.
 - Modify Roblox's own files, settings, or FastFlags, or read its memory.
-- Give you cheats, exploits, aimbots, or any other unfair advantage - that
-  violates Roblox's Terms of Service and risks your account.
+- Give you cheats, exploits, aimbots, ESP/wallhacks, or any other unfair
+  advantage - that violates Roblox's Terms of Service, requires reading the
+  game's process memory, and risks your account.
+- Overclock your CPU/GPU (adjust clock speeds or voltages) - real
+  overclocking can cause instability or hardware damage if done wrong,
+  which is a different risk category from the safe, reversible settings
+  (power plan, process priority, GPU preference) this app actually changes.
 - Clone or impersonate any real person's voice (political figures included).
   The Voice Effects tab only does generic pitch/robot effects - never a
   specific real person.

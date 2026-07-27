@@ -217,6 +217,52 @@
                                        AutomationProperties.LiveSetting="Polite"/>
                         </Border>
 
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="&#128266; Live Voice Changer" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                <TextBlock Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap" Margin="0,0,0,10">
+                                    Continuously processes your mic while running, instead of record-then-play. To
+                                    actually use it inside Roblox voice chat automatically, install a free virtual
+                                    audio cable app yourself (e.g. VB-CABLE), pick it as the output device below, then
+                                    select that same cable as your microphone in Roblox's voice settings. Otherwise,
+                                    pick your normal speakers/headphones below to just hear the effect on yourself.
+                                </TextBlock>
+
+                                <TextBlock Text="Effect" Style="{StaticResource SecondaryTextStyle}" Margin="0,0,0,4"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                    <RadioButton x:Name="LiveNormalRadio" Content="Normal" GroupName="LiveEffect" IsChecked="True" Margin="0,0,14,0"/>
+                                    <RadioButton x:Name="LiveDeepRadio" Content="Deep" GroupName="LiveEffect" Margin="0,0,14,0"/>
+                                    <RadioButton x:Name="LiveHighRadio" Content="High" GroupName="LiveEffect" Margin="0,0,14,0"/>
+                                    <RadioButton x:Name="LiveRobotRadio" Content="Robot" GroupName="LiveEffect"/>
+                                </StackPanel>
+
+                                <TextBlock Text="Output device" Style="{StaticResource SecondaryTextStyle}" Margin="0,0,0,4"/>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox x:Name="LiveOutputDeviceCombo" Grid.Column="0" Margin="0,0,8,0"
+                                              AutomationProperties.Name="Live voice changer output device"/>
+                                    <Button x:Name="RefreshDevicesButton" Grid.Column="1" Content="&#8635;" Style="{StaticResource SecondaryButtonStyle}"
+                                            Padding="12,6" Click="RefreshDevicesButton_Click"
+                                            ToolTip="Refresh the list of output devices (e.g. after installing a virtual audio cable app)."
+                                            AutomationProperties.Name="Refresh output devices"/>
+                                </Grid>
+
+                                <Button x:Name="LiveToggleButton" Content="&#9654; _Start Live Voice Changer" Style="{StaticResource PrimaryButtonStyle}"
+                                        FontSize="15" HorizontalAlignment="Left" Click="LiveToggleButton_Click"
+                                        ToolTip="Continuously applies the selected effect to your microphone and sends it to the chosen output device, until you stop it."
+                                        AutomationProperties.Name="Start or stop the live voice changer"
+                                        AutomationProperties.HelpText="Continuously applies the selected effect to your microphone and sends it to the chosen output device, until you stop it. Keyboard shortcut: Alt+S."/>
+
+                                <TextBlock x:Name="LiveStatusText" Text="Live voice changer is off." Margin="0,10,0,0"
+                                           Style="{StaticResource SecondaryTextStyle}"
+                                           AutomationProperties.Name="Live voice changer status"
+                                           AutomationProperties.LiveSetting="Polite"/>
+                            </StackPanel>
+                        </Border>
+
                         <TextBlock Style="{StaticResource SecondaryTextStyle}" TextWrapping="Wrap" FontSize="12">
                             Tip: to use a changed voice inside Roblox (or Discord) voice chat, install a virtual audio
                             cable app (e.g. VB-CABLE), set your changed-voice output to play into it, then pick that

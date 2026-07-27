@@ -33,6 +33,15 @@ public partial class MainWindow
     private byte[]? _recordedPcm;
     private bool _isRecording;
 
+    private enum VoiceEffectMode { Normal, Deep, High, Robot }
+
+    private WaveInEvent? _liveWaveIn;
+    private WaveOutEvent? _liveWaveOut;
+    private BufferedWaveProvider? _liveOutputBuffer;
+    private VoiceEffectMode _selectedLiveEffect = VoiceEffectMode.Normal;
+    private long _liveSampleIndex;
+    private bool _isLiveModeRunning;
+
     private void RecordButton_Click(object sender, RoutedEventArgs e)
     {
         if (_isRecording)
@@ -213,7 +222,7 @@ public partial class MainWindow
         }
     }
 
-    /// <summary>Stops any in-progress recording/playback - called when the window closes.</summary>
+    /// <summary>Stops any in-progress recording/playback/live mode - called when the window closes.</summary>
     private void StopVoiceActivity()
     {
         try
@@ -232,6 +241,7 @@ public partial class MainWindow
         }
 
         StopPlayback();
+        StopLiveVoiceChanger();
     }
 
     /// <summary>
@@ -249,6 +259,246 @@ public partial class MainWindow
             var modulator = Math.Sin(2 * Math.PI * carrierHz * i / sampleRate);
             var modulated = (short)Math.Clamp(sample * modulator, short.MinValue, short.MaxValue);
             var bytes = BitConverter.GetBytes(modulated);
+            result[i * 2] = bytes[0];
+            result[i * 2 + 1] = bytes[1];
+        }
+
+        return result;
+    }
+
+    // ================= Live Voice Changer =================
+    //
+    // Unlike the record-then-playback feature above, this continuously reads the
+    // microphone and writes processed audio to a chosen output device while running.
+    // "Deep"/"High" can't use the simple "declare a different sample rate" trick here
+    // (that only works for a fixed-length clip - for a live stream it would drift out
+    // of sync or run out of buffered audio within seconds), so instead each small
+    // incoming chunk is resampled to the SAME length via linear interpolation, which
+    // keeps real-time sync perfectly but can sound slightly grainy - an accepted
+    // trade-off for a simple, dependency-free implementation. "Robot" (ring
+    // modulation) has no such issue and sounds clean live, using a running phase
+    // counter so the effect doesn't click at chunk boundaries.
+
+    private void RefreshDevicesButton_Click(object sender, RoutedEventArgs e) => PopulateOutputDevices();
+
+    private void PopulateOutputDevices()
+    {
+        var previousSelection = LiveOutputDeviceCombo.SelectedIndex;
+
+        LiveOutputDeviceCombo.Items.Clear();
+        LiveOutputDeviceCombo.Items.Add("Default output device");
+
+        try
+        {
+            for (var i = 0; i < WaveOut.DeviceCount; i++)
+            {
+                var capabilities = WaveOut.GetCapabilities(i);
+                LiveOutputDeviceCombo.Items.Add(capabilities.ProductName);
+            }
+        }
+        catch (Exception)
+        {
+            // Fall back to just the default device entry - still usable.
+        }
+
+        LiveOutputDeviceCombo.SelectedIndex = previousSelection >= 0 && previousSelection < LiveOutputDeviceCombo.Items.Count
+            ? previousSelection
+            : 0;
+    }
+
+    private void LiveToggleButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_isLiveModeRunning)
+        {
+            StopLiveVoiceChanger();
+        }
+        else
+        {
+            StartLiveVoiceChanger();
+        }
+    }
+
+    private void StartLiveVoiceChanger()
+    {
+        if (_isRecording)
+        {
+            LiveStatusText.Text = "Finish the current recording first.";
+            return;
+        }
+
+        try
+        {
+            if (WaveInEvent.DeviceCount == 0)
+            {
+                LiveStatusText.Text = "No microphone was found on this PC.";
+                return;
+            }
+
+            _selectedLiveEffect = LiveDeepRadio.IsChecked == true ? VoiceEffectMode.Deep
+                : LiveHighRadio.IsChecked == true ? VoiceEffectMode.High
+                : LiveRobotRadio.IsChecked == true ? VoiceEffectMode.Robot
+                : VoiceEffectMode.Normal;
+
+            // Index 0 in the combo is "Default output device" (NAudio's DeviceNumber -1);
+            // every entry after that lines up with WaveOut.GetCapabilities(index - 1).
+            var outputDeviceNumber = LiveOutputDeviceCombo.SelectedIndex <= 0 ? -1 : LiveOutputDeviceCombo.SelectedIndex - 1;
+
+            _liveOutputBuffer = new BufferedWaveProvider(new WaveFormat(VoiceSampleRate, VoiceBitsPerSample, VoiceChannels))
+            {
+                DiscardOnBufferOverflow = true,
+                BufferDuration = TimeSpan.FromSeconds(2)
+            };
+
+            _liveWaveOut = new WaveOutEvent { DeviceNumber = outputDeviceNumber };
+            _liveWaveOut.Init(_liveOutputBuffer);
+            _liveWaveOut.Play();
+
+            _liveSampleIndex = 0;
+            _liveWaveIn = new WaveInEvent
+            {
+                WaveFormat = new WaveFormat(VoiceSampleRate, VoiceBitsPerSample, VoiceChannels)
+            };
+            _liveWaveIn.DataAvailable += OnLiveDataAvailable;
+            _liveWaveIn.StartRecording();
+
+            _isLiveModeRunning = true;
+            LiveToggleButton.Content = "⏹ _Stop Live Voice Changer";
+            SetLiveControlsEnabled(false);
+            LiveStatusText.Text = $"Live voice changer is running ({_selectedLiveEffect} effect).";
+        }
+        catch (Exception ex)
+        {
+            StopLiveVoiceChanger();
+            LiveStatusText.Text = "Couldn't start the live voice changer: " + ex.Message +
+                " (check Windows Settings > Privacy & security > Microphone.)";
+        }
+    }
+
+    private void StopLiveVoiceChanger()
+    {
+        try
+        {
+            _liveWaveIn?.StopRecording();
+            _liveWaveIn?.Dispose();
+        }
+        catch (Exception)
+        {
+            // Best effort.
+        }
+        finally
+        {
+            _liveWaveIn = null;
+        }
+
+        try
+        {
+            _liveWaveOut?.Stop();
+            _liveWaveOut?.Dispose();
+        }
+        catch (Exception)
+        {
+            // Best effort.
+        }
+        finally
+        {
+            _liveWaveOut = null;
+        }
+
+        _liveOutputBuffer = null;
+
+        if (_isLiveModeRunning)
+        {
+            LiveStatusText.Text = "Live voice changer is off.";
+        }
+
+        _isLiveModeRunning = false;
+        LiveToggleButton.Content = "▶ _Start Live Voice Changer";
+        SetLiveControlsEnabled(true);
+    }
+
+    private void SetLiveControlsEnabled(bool enabled)
+    {
+        LiveNormalRadio.IsEnabled = enabled;
+        LiveDeepRadio.IsEnabled = enabled;
+        LiveHighRadio.IsEnabled = enabled;
+        LiveRobotRadio.IsEnabled = enabled;
+        LiveOutputDeviceCombo.IsEnabled = enabled;
+        RefreshDevicesButton.IsEnabled = enabled;
+
+        // A second WaveInEvent on the same mic while live mode owns it would fail - keep Record disabled meanwhile.
+        RecordButton.IsEnabled = enabled;
+    }
+
+    private void OnLiveDataAvailable(object? sender, WaveInEventArgs e)
+    {
+        var buffer = _liveOutputBuffer;
+        if (buffer is null || e.BytesRecorded == 0)
+        {
+            return;
+        }
+
+        switch (_selectedLiveEffect)
+        {
+            case VoiceEffectMode.Robot:
+                var robotBytes = ApplyRingModulationContinuous(e.Buffer, e.BytesRecorded, VoiceSampleRate);
+                buffer.AddSamples(robotBytes, 0, robotBytes.Length);
+                break;
+            case VoiceEffectMode.Deep:
+                var deepBytes = ApplyBlockPitchShift(e.Buffer, e.BytesRecorded, 0.75);
+                buffer.AddSamples(deepBytes, 0, deepBytes.Length);
+                break;
+            case VoiceEffectMode.High:
+                var highBytes = ApplyBlockPitchShift(e.Buffer, e.BytesRecorded, 1.4);
+                buffer.AddSamples(highBytes, 0, highBytes.Length);
+                break;
+            default:
+                buffer.AddSamples(e.Buffer, 0, e.BytesRecorded);
+                break;
+        }
+    }
+
+    /// <summary>Ring modulation with a phase counter that keeps advancing across calls, so consecutive chunks don't click at the seams.</summary>
+    private byte[] ApplyRingModulationContinuous(byte[] buffer, int bytesRecorded, int sampleRate)
+    {
+        var result = new byte[bytesRecorded];
+        var sampleCount = bytesRecorded / 2;
+
+        for (var i = 0; i < sampleCount; i++)
+        {
+            var sample = BitConverter.ToInt16(buffer, i * 2);
+            var modulator = Math.Sin(2 * Math.PI * 60.0 * _liveSampleIndex / sampleRate);
+            var modulated = (short)Math.Clamp(sample * modulator, short.MinValue, short.MaxValue);
+            var bytes = BitConverter.GetBytes(modulated);
+            result[i * 2] = bytes[0];
+            result[i * 2 + 1] = bytes[1];
+            _liveSampleIndex++;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Resamples one chunk via linear interpolation, but forces the output back to the
+    /// same length as the input - a simple way to shift pitch on a live stream without
+    /// the timing drift a straight sample-rate trick would cause. pitchRatio &lt; 1 = lower/deeper, &gt; 1 = higher.
+    /// </summary>
+    private static byte[] ApplyBlockPitchShift(byte[] buffer, int bytesRecorded, double pitchRatio)
+    {
+        var sampleCount = bytesRecorded / 2;
+        var result = new byte[bytesRecorded];
+
+        for (var i = 0; i < sampleCount; i++)
+        {
+            var sourcePosition = i * pitchRatio;
+            var sourceIndex = (int)sourcePosition;
+            var frac = sourcePosition - sourceIndex;
+
+            var sampleA = sourceIndex < sampleCount ? BitConverter.ToInt16(buffer, sourceIndex * 2) : (short)0;
+            var nextIndex = sourceIndex + 1;
+            var sampleB = nextIndex < sampleCount ? BitConverter.ToInt16(buffer, nextIndex * 2) : sampleA;
+
+            var interpolated = (short)(sampleA * (1 - frac) + sampleB * frac);
+            var bytes = BitConverter.GetBytes(interpolated);
             result[i * 2] = bytes[0];
             result[i * 2 + 1] = bytes[1];
         }

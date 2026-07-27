@@ -80,6 +80,7 @@ public partial class MainWindow : Window
         Closing += MainWindow_Closing;
 
         TryRestorePreviousSessionState();
+        PopulateOutputDevices();
     }
 
     // ----- Live dashboard -----
@@ -164,20 +165,71 @@ public partial class MainWindow : Window
         }
     }
 
+    private const int PingSamplesPerRefresh = 3;
+    private const int PingTimeoutMs = 800;
+
+    /// <summary>
+    /// Sends a few quick pings each refresh instead of just one, so the dashboard can show
+    /// jitter (ping variability) and packet loss too - not just a single current reading.
+    /// This is still general Internet route quality to a public server, not the exact Roblox
+    /// game-server ping (there's no way to discover that).
+    /// </summary>
     private async Task RefreshPingAsync()
     {
+        var roundTripTimes = new List<long>();
+
         try
         {
             using var ping = new Ping();
-            var reply = await ping.SendPingAsync("1.1.1.1", 1000).ConfigureAwait(true);
-            PingText.Text = reply.Status == IPStatus.Success
-                ? $"Ping: {reply.RoundtripTime} ms"
-                : "Ping: unavailable";
+
+            for (var i = 0; i < PingSamplesPerRefresh; i++)
+            {
+                try
+                {
+                    var reply = await ping.SendPingAsync("1.1.1.1", PingTimeoutMs).ConfigureAwait(true);
+                    if (reply.Status == IPStatus.Success)
+                    {
+                        roundTripTimes.Add(reply.RoundtripTime);
+                    }
+                }
+                catch (Exception)
+                {
+                    // Counts as a lost sample below - a single failed ping shouldn't abort the whole read.
+                }
+            }
         }
         catch (Exception)
         {
             PingText.Text = "Ping: unavailable";
+            return;
         }
+
+        if (roundTripTimes.Count == 0)
+        {
+            PingText.Text = "Ping: unavailable";
+            return;
+        }
+
+        var current = roundTripTimes[^1];
+        var lossPercent = (PingSamplesPerRefresh - roundTripTimes.Count) * 100 / PingSamplesPerRefresh;
+
+        if (roundTripTimes.Count < 2)
+        {
+            PingText.Text = $"Ping: {current} ms";
+            return;
+        }
+
+        long jitterTotal = 0;
+        for (var i = 1; i < roundTripTimes.Count; i++)
+        {
+            jitterTotal += Math.Abs(roundTripTimes[i] - roundTripTimes[i - 1]);
+        }
+
+        var jitter = jitterTotal / (roundTripTimes.Count - 1);
+
+        PingText.Text = lossPercent > 0
+            ? $"Ping: {current} ms (jitter {jitter} ms, {lossPercent}% loss)"
+            : $"Ping: {current} ms (jitter {jitter} ms)";
     }
 
     private static PerformanceCounter? TryCreateCpuCounter()
