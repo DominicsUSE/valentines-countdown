@@ -62,11 +62,18 @@ Undo still works.
   in live mode use a lightweight per-chunk resampling trick to keep timing
   in sync, so they can sound a bit more textured than the pre-recorded
   version above; "Robot" sounds the same either way.
-- **Louder output**: every effect (recorded playback and live) applies a
-  built-in ~2x volume boost before it's played, so the processed voice
-  comes through noticeably louder than your raw mic input. Very loud
+- **Louder output**: an adjustable **Volume boost** slider (1x-3x, default
+  2x) applies to every effect (recorded playback and live), so the
+  processed voice comes through louder than your raw mic input. Very loud
   peaks are clamped rather than distorted/wrapped - the normal, safe way
   software raises loudness.
+- **Mic input level meter**: a live bar that moves while you talk, during
+  either recording or the live voice changer - the fastest way to tell
+  whether the app is actually receiving your microphone at all, before
+  troubleshooting anything else.
+- **Test output device**: plays a short tone on whichever output device
+  is selected, independent of your microphone - confirms a virtual audio
+  cable is wired up correctly without needing to talk or open Roblox.
 - To have a live-changed voice actually heard inside Roblox's (or
   Discord's) voice chat: install a free virtual audio cable app yourself
   (e.g. VB-CABLE - not bundled with this project), pick it as the Live

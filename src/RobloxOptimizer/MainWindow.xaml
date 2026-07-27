@@ -210,6 +210,29 @@
                             </StackPanel>
                         </Border>
 
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Voice settings" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+                                <TextBlock Text="Mic input level" Style="{StaticResource SecondaryTextStyle}" Margin="0,0,0,4"/>
+                                <ProgressBar x:Name="InputLevelBar" Minimum="0" Maximum="100" Height="10" Margin="0,0,0,6"
+                                             Foreground="{StaticResource GoodBrush}" Background="{StaticResource MutedButtonBrush}" BorderThickness="0"
+                                             AutomationProperties.Name="Microphone input level"
+                                             AutomationProperties.HelpText="Moves while you talk during recording or the live voice changer. If it stays at zero while you're speaking, Windows isn't giving this app your microphone."/>
+                                <TextBlock Style="{StaticResource SecondaryTextStyle}" FontSize="12" Margin="0,0,0,10" TextWrapping="Wrap">
+                                    Moves while you talk during recording or the live voice changer. If it stays flat
+                                    at zero while you're speaking, Windows isn't giving this app your microphone -
+                                    check Settings &gt; Privacy &amp; security &gt; Microphone.
+                                </TextBlock>
+
+                                <TextBlock Text="Volume boost" Style="{StaticResource SecondaryTextStyle}" Margin="0,0,0,4"/>
+                                <Slider x:Name="VoiceGainSlider" Minimum="1" Maximum="3" Value="2" TickFrequency="0.5"
+                                        ValueChanged="VoiceGainSlider_ValueChanged"
+                                        AutomationProperties.Name="Voice effect volume boost"
+                                        AutomationProperties.HelpText="How much louder recorded playback and the live voice changer sound compared to your raw microphone input. 1 is no boost, 3 is roughly three times louder; very loud peaks are clamped rather than distorted."/>
+                            </StackPanel>
+                        </Border>
+
                         <Button x:Name="RecordButton" Content="&#127908; _Record 5 Seconds" Style="{StaticResource PrimaryButtonStyle}"
                                 FontSize="15" HorizontalAlignment="Left" Margin="0,0,0,14" Click="RecordButton_Click"
                                 ToolTip="Records 5 seconds from your default microphone."
@@ -263,13 +286,19 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <ComboBox x:Name="LiveOutputDeviceCombo" Grid.Column="0" Margin="0,0,8,0"
                                               AutomationProperties.Name="Live voice changer output device"/>
                                     <Button x:Name="RefreshDevicesButton" Grid.Column="1" Content="&#8635;" Style="{StaticResource SecondaryButtonStyle}"
-                                            Padding="12,6" Click="RefreshDevicesButton_Click"
+                                            Padding="12,6" Margin="0,0,8,0" Click="RefreshDevicesButton_Click"
                                             ToolTip="Refresh the list of output devices (e.g. after installing a virtual audio cable app)."
                                             AutomationProperties.Name="Refresh output devices"/>
+                                    <Button x:Name="TestOutputButton" Grid.Column="2" Content="&#128266; _Test" Style="{StaticResource SecondaryButtonStyle}"
+                                            Padding="12,6" Click="TestOutputButton_Click"
+                                            ToolTip="Plays a short test tone on the selected output device, independent of your microphone - use it to confirm a virtual audio cable is wired up correctly."
+                                            AutomationProperties.Name="Test output device"
+                                            AutomationProperties.HelpText="Plays a short test tone on the selected output device, independent of your microphone. Keyboard shortcut: Alt+T."/>
                                 </Grid>
 
                                 <Button x:Name="LiveToggleButton" Content="&#9654; _Start Live Voice Changer" Style="{StaticResource PrimaryButtonStyle}"

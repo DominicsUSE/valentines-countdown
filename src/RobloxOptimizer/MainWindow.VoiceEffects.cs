@@ -27,9 +27,15 @@ public partial class MainWindow
     private static readonly TimeSpan RecordingDuration = TimeSpan.FromSeconds(5);
 
     // Linear gain applied to every effect (record-and-play and live) so the processed voice comes
-    // through noticeably louder than the raw mic signal. 2.0x is roughly +6 dB; loud peaks clamp
+    // through noticeably louder than the raw mic signal - now adjustable via VoiceGainSlider
+    // instead of a fixed value. 2.0x (the slider's default) is roughly +6 dB; loud peaks clamp
     // instead of wrapping, which is the standard, safe way to boost volume in software.
-    private const double VoiceGainBoost = 2.0;
+    private double _voiceGain = 2.0;
+
+    // Written from the mic's background capture thread, read on the UI thread by _levelMeterTimer -
+    // a plain field is enough for a display meter (no lock needed, a slightly stale read is fine).
+    private int _inputLevelPercent;
+    private DispatcherTimer? _levelMeterTimer;
 
     private WaveInEvent? _waveIn;
     private WaveOutEvent? _waveOut;
@@ -46,6 +52,42 @@ public partial class MainWindow
     private VoiceEffectMode _selectedLiveEffect = VoiceEffectMode.Normal;
     private long _liveSampleIndex;
     private bool _isLiveModeRunning;
+
+    private void VoiceGainSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => _voiceGain = e.NewValue;
+
+    private void StartLevelMeter()
+    {
+        if (_levelMeterTimer is null)
+        {
+            _levelMeterTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+            _levelMeterTimer.Tick += (_, _) => InputLevelBar.Value = _inputLevelPercent;
+        }
+
+        _levelMeterTimer.Start();
+    }
+
+    private void StopLevelMeter()
+    {
+        _levelMeterTimer?.Stop();
+        _inputLevelPercent = 0;
+        InputLevelBar.Value = 0;
+    }
+
+    /// <summary>Peak amplitude of one chunk as a 0-100 percentage of full scale - the basis of the mic input level meter.</summary>
+    private static int ComputePeakPercent(byte[] pcm16Mono, int bytesRecorded)
+    {
+        var peak = 0;
+        for (var i = 0; i + 1 < bytesRecorded; i += 2)
+        {
+            var sample = Math.Abs((int)BitConverter.ToInt16(pcm16Mono, i));
+            if (sample > peak)
+            {
+                peak = sample;
+            }
+        }
+
+        return Math.Min(100, peak * 100 / short.MaxValue);
+    }
 
     private void RecordButton_Click(object sender, RoutedEventArgs e)
     {
@@ -76,6 +118,7 @@ public partial class MainWindow
             _isRecording = true;
             RecordButton.IsEnabled = false;
             VoiceStatusText.Text = "Recording... speak now (5 seconds).";
+            StartLevelMeter();
 
             _waveIn.StartRecording();
 
@@ -105,6 +148,7 @@ public partial class MainWindow
 
     private void OnDataAvailable(object? sender, WaveInEventArgs e)
     {
+        _inputLevelPercent = ComputePeakPercent(e.Buffer, e.BytesRecorded);
         _recordedBuffer.Write(e.Buffer, 0, e.BytesRecorded);
     }
 
@@ -114,6 +158,7 @@ public partial class MainWindow
         {
             _isRecording = false;
             RecordButton.IsEnabled = true;
+            StopLevelMeter();
 
             _recordedPcm = _recordedBuffer.ToArray();
             _waveIn?.Dispose();
@@ -161,7 +206,7 @@ public partial class MainWindow
         {
             StopPlayback();
             var robotPcm = ApplyRingModulation(_recordedPcm, VoiceSampleRate, carrierHz: 60);
-            ApplyGainInPlace(robotPcm, VoiceGainBoost);
+            ApplyGainInPlace(robotPcm, _voiceGain);
             PlayRawPcm(robotPcm, VoiceSampleRate, "Robot");
         }
         catch (Exception ex)
@@ -181,7 +226,7 @@ public partial class MainWindow
         {
             StopPlayback();
             var boosted = (byte[])_recordedPcm.Clone();
-            ApplyGainInPlace(boosted, VoiceGainBoost);
+            ApplyGainInPlace(boosted, _voiceGain);
             PlayRawPcm(boosted, declaredSampleRate, label);
         }
         catch (Exception ex)
@@ -302,6 +347,55 @@ public partial class MainWindow
 
     private void RefreshDevicesButton_Click(object sender, RoutedEventArgs e) => PopulateOutputDevices();
 
+    /// <summary>
+    /// Plays a short test tone on whichever output device is selected, independent of the
+    /// microphone - lets you confirm a virtual audio cable is wired up correctly without needing
+    /// to talk, and without needing Roblox open at all.
+    /// </summary>
+    private void TestOutputButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var outputDeviceNumber = LiveOutputDeviceCombo.SelectedIndex <= 0 ? -1 : LiveOutputDeviceCombo.SelectedIndex - 1;
+            var tonePcm = GenerateTestTone(VoiceSampleRate, frequencyHz: 440, TimeSpan.FromSeconds(0.6));
+
+            var stream = new MemoryStream(tonePcm);
+            var rawStream = new RawSourceWaveStream(stream, new WaveFormat(VoiceSampleRate, VoiceBitsPerSample, VoiceChannels));
+
+            var testOut = new WaveOutEvent { DeviceNumber = outputDeviceNumber };
+            testOut.Init(rawStream);
+            testOut.PlaybackStopped += (_, _) =>
+            {
+                rawStream.Dispose();
+                stream.Dispose();
+                testOut.Dispose();
+            };
+            testOut.Play();
+
+            LiveStatusText.Text = "Playing a test tone on the selected output device - if you didn't hear it, try a different device above.";
+        }
+        catch (Exception ex)
+        {
+            LiveStatusText.Text = "Couldn't play the test tone: " + ex.Message;
+        }
+    }
+
+    private static byte[] GenerateTestTone(int sampleRate, double frequencyHz, TimeSpan duration)
+    {
+        var sampleCount = (int)(sampleRate * duration.TotalSeconds);
+        var result = new byte[sampleCount * 2];
+
+        for (var i = 0; i < sampleCount; i++)
+        {
+            var sample = (short)(short.MaxValue * 0.5 * Math.Sin(2 * Math.PI * frequencyHz * i / sampleRate));
+            var bytes = BitConverter.GetBytes(sample);
+            result[i * 2] = bytes[0];
+            result[i * 2 + 1] = bytes[1];
+        }
+
+        return result;
+    }
+
     private void HowToRouteButton_Click(object sender, RoutedEventArgs e)
     {
         MessageBox.Show(this,
@@ -405,6 +499,7 @@ public partial class MainWindow
             _isLiveModeRunning = true;
             LiveToggleButton.Content = "⏹ _Stop Live Voice Changer";
             SetLiveControlsEnabled(false);
+            StartLevelMeter();
             LiveStatusText.Text = $"Live voice changer is running ({_selectedLiveEffect} effect).";
         }
         catch (Exception ex)
@@ -446,6 +541,7 @@ public partial class MainWindow
         }
 
         _liveOutputBuffer = null;
+        StopLevelMeter();
 
         if (_isLiveModeRunning)
         {
@@ -478,6 +574,8 @@ public partial class MainWindow
             return;
         }
 
+        _inputLevelPercent = ComputePeakPercent(e.Buffer, e.BytesRecorded);
+
         byte[] processed;
         switch (_selectedLiveEffect)
         {
@@ -496,7 +594,7 @@ public partial class MainWindow
                 break;
         }
 
-        ApplyGainInPlace(processed, VoiceGainBoost);
+        ApplyGainInPlace(processed, _voiceGain);
         buffer.AddSamples(processed, 0, processed.Length);
     }
 
