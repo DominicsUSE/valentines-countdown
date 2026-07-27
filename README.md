@@ -75,12 +75,13 @@ Undo still works.
   is selected, independent of your microphone - confirms a virtual audio
   cable is wired up correctly without needing to talk or open Roblox.
 - To have a live-changed voice actually heard inside Roblox, Discord,
-  Zoom, Teams, Skype, or any other app's voice chat/calls **on this PC**:
-  install a free virtual audio cable app yourself (e.g. VB-CABLE - not
-  bundled with this project), pick it as the Live Voice Changer's output
-  device, then select that same cable as your microphone in that other
-  app's own settings. The **"How do I use this in Discord/Zoom/calls?"**
-  button on the Voice Effects tab walks through these exact steps -
+  Telegram, Zoom, Teams, Skype, or any other app's voice chat/calls **on
+  this PC**: install a free virtual audio cable app yourself (e.g.
+  VB-CABLE - not bundled with this project), pick it as the Live Voice
+  Changer's output device, then select that same cable as your microphone
+  in that other app's own settings. The **"How do I use this in other
+  apps/calls?"** button on the Voice Effects tab walks through these
+  exact steps -
   without them, picking your normal speakers only lets you hear the
   effect yourself, since Windows doesn't let one app silently replace
   another app's microphone. This can't reach an actual call on your

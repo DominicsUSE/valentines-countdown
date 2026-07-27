@@ -400,16 +400,16 @@ public partial class MainWindow
     {
         MessageBox.Show(this,
             "Picking your normal speakers above only lets YOU hear the effect - Windows doesn't let " +
-            "one app silently replace another app's microphone, so Roblox, Discord, Zoom, Teams, " +
-            "Skype, or any other app can't hear it that way. Here's the actual path other " +
-            "voice-changer apps use too - it works the same for any app running on this PC (it " +
-            "can't reach an actual call on your phone's cellular network, since that's separate " +
-            "hardware):\n\n" +
+            "one app silently replace another app's microphone, so Roblox, Discord, Telegram, " +
+            "Zoom, Teams, Skype, or any other app can't hear it that way. Here's the actual path " +
+            "other voice-changer apps use too - it works the same for any app running on this PC " +
+            "(it can't reach an actual call on your phone's cellular network, since that's " +
+            "separate hardware):\n\n" +
             "1. Install a free virtual audio cable app yourself, e.g. VB-CABLE from vb-audio.com " +
             "(not included here - it installs its own audio driver, so Windows will ask you to " +
             "approve that install).\n\n" +
-            "2. Restart this app (and the other app - Roblox, Discord, Zoom, etc. - if it's already " +
-            "open) so both see the new device.\n\n" +
+            "2. Restart this app (and the other app - Roblox, Discord, Telegram, Zoom, etc. - if " +
+            "it's already open) so both see the new device.\n\n" +
             "3. In the \"Output device\" dropdown above, click the refresh button and pick the " +
             "cable's input (e.g. \"CABLE Input\"), then click Start Live Voice Changer.\n\n" +
             "4. In the other app's own voice/microphone settings, pick the cable's output (e.g. " +
