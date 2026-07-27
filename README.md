@@ -7,7 +7,9 @@ firewall/Windows Update, and every change has an Undo.
 
 ## What it does
 
-- **Dashboard**: shows whether Roblox is running, current CPU and RAM usage,
+**Optimize tab**
+
+- **Live status**: whether Roblox is running, current CPU and RAM usage,
   and ping to a public Internet server (a general connection check, not
   your exact Roblox server ping - it's labeled that way in the app).
 - **Optimize for Roblox** (one button):
@@ -26,11 +28,29 @@ applied, it also keeps a small backup file at
 `%LOCALAPPDATA%\RobloxOptimizer\backup.txt` so the next time you open it,
 Undo still works.
 
+**Voice Effects tab**
+
+Record 5 seconds from your mic, then play it back through your speakers
+with a fun effect: Normal, Deep Voice, High Voice, or Robot. It's a novelty
+feature, not a real microphone replacement - see "What it will never do"
+below for exactly why, and what would actually be involved if you want a
+changed voice inside Roblox's own voice chat.
+
 ## What it will never do
 
 - Ask for administrator rights.
 - Touch antivirus software, the Windows Firewall, or Windows Update.
 - Modify Roblox's own files, settings, or FastFlags, or read its memory.
+- Give you cheats, exploits, aimbots, or any other unfair advantage - that
+  violates Roblox's Terms of Service and risks your account.
+- Clone or impersonate any real person's voice (political figures included).
+  The Voice Effects tab only does generic pitch/robot effects - never a
+  specific real person.
+- Feed a changed voice into Roblox's (or any other app's) voice chat by
+  itself - Windows doesn't allow one app to replace another app's
+  microphone input without a virtual audio cable driver, and this app
+  doesn't install one for you. Pair it yourself with a well-known free tool
+  like VB-Audio Virtual Cable if you want that.
 - Promise a specific FPS number or "zero ping" - performance still depends
   on your hardware, your internet connection, and the specific Roblox
   experience/server you're in.
@@ -90,12 +110,19 @@ dotnet publish src\RobloxOptimizer\RobloxOptimizer.csproj -c Release -r win-x64 
 
 ## How it's built
 
-One WPF project (`src/RobloxOptimizer/`), two code files:
+One WPF project (`src/RobloxOptimizer/`), three code files:
 
-- `MainWindow.xaml` - the whole UI.
-- `MainWindow.xaml.cs` - the whole app: reads CPU/RAM/ping/Roblox status
+- `MainWindow.xaml` - the whole UI (a two-tab window: Optimize, Voice Effects).
+- `MainWindow.xaml.cs` - the Optimize tab: reads CPU/RAM/ping/Roblox status
   every 2 seconds, and implements Optimize/Undo directly against the
   Windows registry and `powercfg`, with a small on-disk backup file for
-  crash resilience. No dependency-injection container, no separate
-  projects for each concern - deliberately kept to one file per concern so
-  it's easy to read top to bottom.
+  crash resilience.
+- `MainWindow.VoiceEffects.cs` - the Voice Effects tab: records/plays back
+  audio via [NAudio](https://github.com/naudio/NAudio), with the effects
+  implemented as plain, simple DSP (playback-rate tricks for Deep/High,
+  ring modulation for Robot) - no cloning, no machine learning model.
+
+No dependency-injection container, no separate projects per concern -
+deliberately kept to a handful of files so it's easy to read top to bottom.
+`.github/workflows/build-roblox-optimizer.yml` builds and verifies it on
+real Windows on every push (see "Get a ready-to-run copy" above).
